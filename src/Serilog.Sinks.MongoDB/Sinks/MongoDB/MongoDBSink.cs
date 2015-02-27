@@ -15,7 +15,6 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Serilog.Events;
-using Serilog.Formatting.Json;
 using Serilog.Sinks.PeriodicBatching;
 using System;
 using System.Collections.Generic;
@@ -124,8 +123,7 @@ namespace Serilog.Sinks.MongoDB
             var payload = new StringWriter();
             payload.Write("{\"d\":[");
 
-            var formatter = new JsonFormatter(
-                omitEnclosingObject: true,
+            var formatter = new MongoDBJsonFormatter(true,
                 renderMessage: true,
                 formatProvider: _formatProvider);
 

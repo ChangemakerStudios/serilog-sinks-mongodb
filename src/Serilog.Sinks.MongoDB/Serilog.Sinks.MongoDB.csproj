@@ -75,6 +75,7 @@
     <Compile Include="..\..\assets\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Sinks\MongoDB\MongoDBJsonFormatter.cs" />
     <Compile Include="Sinks\MongoDB\MongoDBSink.cs" />
   </ItemGroup>
   <ItemGroup>
