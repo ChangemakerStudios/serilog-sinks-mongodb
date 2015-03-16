@@ -16,7 +16,6 @@ using System;
 using Serilog.Configuration;
 using Serilog.Events;
 using Serilog.Sinks.MongoDB;
-using MongoDB.Driver.Builders;
 using MongoDB.Driver;
 
 namespace Serilog
@@ -56,7 +55,7 @@ namespace Serilog
                     defaultedPeriod,
                     formatProvider,
                     MongoDBSink.DefaultCollectionName,
-                    CollectionOptions.Null),
+                    new CreateCollectionOptions()),
                 restrictedToMinimumLevel);
         }
 
@@ -90,7 +89,7 @@ namespace Serilog
                     defaultedPeriod,
                     formatProvider,
                     MongoDBSink.DefaultCollectionName,
-                    CollectionOptions.Null),
+                    new CreateCollectionOptions()),
                 restrictedToMinimumLevel);
         }
 
@@ -122,11 +121,15 @@ namespace Serilog
             if (loggerConfiguration == null) throw new ArgumentNullException("loggerConfiguration");
             if (databaseUrl == null) throw new ArgumentNullException("databaseUrl");
 
-            var optionsBuilder = CollectionOptions.SetCapped(true).SetMaxSize(cappedMaxSizeMb * 1024 * 1024);
+            var options = new CreateCollectionOptions
+            {
+                Capped = true,
+                MaxSize = cappedMaxSizeMb * 1024 * 1024
+            };
 
             if (cappedMaxDocuments.HasValue)
             {
-                optionsBuilder = optionsBuilder.SetMaxDocuments(cappedMaxDocuments.Value);
+                options.MaxDocuments = cappedMaxDocuments.Value;
             }
 
             var defaultedPeriod = period ?? MongoDBSink.DefaultPeriod;
@@ -137,7 +140,7 @@ namespace Serilog
                     defaultedPeriod,
                     formatProvider,
                     collectionName ?? MongoDBSink.DefaultCollectionName,
-                    optionsBuilder),
+                    options),
                 restrictedToMinimumLevel);
         }
 
@@ -169,11 +172,15 @@ namespace Serilog
             if (loggerConfiguration == null) throw new ArgumentNullException("loggerConfiguration");
             if (database == null) throw new ArgumentNullException("database");
 
-            var optionsBuilder = CollectionOptions.SetCapped(true).SetMaxSize(cappedMaxSizeMb * 1024 * 1024);
+            var options = new CreateCollectionOptions()
+            {
+                Capped = true,
+                MaxSize = cappedMaxSizeMb * 1024 * 1024
+            };
 
             if (cappedMaxDocuments.HasValue)
             {
-                optionsBuilder = optionsBuilder.SetMaxDocuments(cappedMaxDocuments.Value);
+                options.MaxDocuments = cappedMaxDocuments.Value;
             }
 
             var defaultedPeriod = period ?? MongoDBSink.DefaultPeriod;
@@ -184,7 +191,7 @@ namespace Serilog
                     defaultedPeriod,
                     formatProvider,
                     collectionName ?? MongoDBSink.DefaultCollectionName,
-                    optionsBuilder),
+                    options),
                 restrictedToMinimumLevel);
         }
     }

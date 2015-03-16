@@ -30,7 +30,7 @@ namespace Serilog.Sinks.MongoDB
     public class MongoDBSink : PeriodicBatchingSink
     {
         readonly string _collectionName;
-        readonly IMongoCollectionOptions _collectionCreationOptions;
+        readonly CreateCollectionOptions _collectionCreationOptions;
         readonly IFormatProvider _formatProvider;
         readonly IMongoDatabase _mongoDatabase;
 
@@ -59,7 +59,7 @@ namespace Serilog.Sinks.MongoDB
         /// <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
         /// <param name="collectionName">Name of the MongoDb collection to use for the log. Default is "log".</param>
         /// <param name="collectionCreationOptions">Collection Creation Options for the log collection creation.</param>
-        public MongoDBSink(string databaseUrl, int batchPostingLimit, TimeSpan period, IFormatProvider formatProvider, string collectionName, IMongoCollectionOptions collectionCreationOptions)
+        public MongoDBSink(string databaseUrl, int batchPostingLimit, TimeSpan period, IFormatProvider formatProvider, string collectionName, CreateCollectionOptions collectionCreationOptions)
             : this (DatabaseFromMongoUrl(databaseUrl), batchPostingLimit, period, formatProvider, collectionName, collectionCreationOptions)
         {
         }
@@ -73,7 +73,7 @@ namespace Serilog.Sinks.MongoDB
         /// <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
         /// <param name="collectionName">Name of the MongoDb collection to use for the log. Default is "log".</param>
         /// <param name="collectionCreationOptions">Collection Creation Options for the log collection creation.</param>
-        public MongoDBSink(IMongoDatabase database, int batchPostingLimit, TimeSpan period, IFormatProvider formatProvider, string collectionName, IMongoCollectionOptions collectionCreationOptions)
+        public MongoDBSink(IMongoDatabase database, int batchPostingLimit, TimeSpan period, IFormatProvider formatProvider, string collectionName, CreateCollectionOptions collectionCreationOptions)
             : base(batchPostingLimit, period)
         {
             if (database == null) throw new ArgumentNullException("database");

@@ -1,0 +1,5 @@
+﻿# EditorConfig
+# 4 space indentation
+[*.cs]
+indent_style = space
+indent_size = 4
