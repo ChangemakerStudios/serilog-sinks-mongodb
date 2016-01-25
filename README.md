@@ -7,10 +7,18 @@ A Serilog sink that writes events as documents to [MongoDB](http://mongodb.org).
 **Package** - [Serilog.Sinks.MongoDB](http://nuget.org/packages/serilog.sinks.mongodb)
 | **Platforms** - .NET 4.5
 
-You'll need to create a collection on your MongoDB server. In the example shown, it is called `log`.
+You'll need to create a collection on your MongoDB server. In the example shown, the database in use is called `logs`. The collection name is `log` and is created implicitely.
 
 ```csharp
 var log = new LoggerConfiguration()
-    .WriteTo.MongoDB("mongo://mymongodb/log")
+    .WriteTo.MongoDB("mongodb://mymongodb/logs")
+    .CreateLogger();
+```
+
+Additionally you can utilize a [Capped Collection](https://docs.mongodb.org/manual/core/capped-collections/). This type allows explicit collection naming.
+
+```csharp
+var log = new LoggerConfiguration()
+    .WriteTo.MongoDBCapped("mongodb://mymongodb/logs", collectionName: "customCollectionName")
     .CreateLogger();
 ```
