@@ -82,6 +82,8 @@ namespace Serilog.Sinks.MongoDB
             _collectionName = collectionName;
             _collectionCreationOptions = collectionCreationOptions;
             _formatProvider = formatProvider;
+            
+            VerifyCollection();
         }
 
         /// <summary>
@@ -107,9 +109,13 @@ namespace Serilog.Sinks.MongoDB
         /// <summary>
         /// Verifies the the MongoDatabase collection exists or creates it if it doesn't.
         /// </summary>
-        [Obsolete("MongoDB no longer needs to be checked, it'll create on the fly")]
         protected void VerifyCollection()
         {
+            // This is required to correctly create a capped collection
+            if (!_mongoDatabase.CollectionExists(_collectionName))
+            {
+                _mongoDatabase.CreateCollection(_collectionName, _collectionCreationOptions);
+            }
         }
 
         /// <summary>
