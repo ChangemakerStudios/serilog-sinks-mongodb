@@ -82,6 +82,19 @@ namespace Serilog.Sinks.MongoDB
             _collectionName = collectionName;
             _collectionCreationOptions = collectionCreationOptions;
             _formatProvider = formatProvider;
+
+            //  capped collections have to be created because GetCollection doesn't offer the option to create one implicitly
+            //  only create one if it doesn't already exist
+            if (_collectionCreationOptions.Capped.GetValueOrDefault(false)) 
+            {
+                if (_mongoDatabase.ListCollections(new ListCollectionsOptions 
+                {
+                    Filter = new BsonDocument {{"name", _collectionName}}
+                }).ToList().Count == 0) 
+                {
+                    _mongoDatabase.CreateCollection(_collectionName, _collectionCreationOptions);
+                }
+            }
         }
 
         /// <summary>
