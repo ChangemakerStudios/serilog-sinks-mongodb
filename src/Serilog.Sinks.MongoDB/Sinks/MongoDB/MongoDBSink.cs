@@ -15,13 +15,12 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Serilog.Events;
+using Serilog.Sinks.PeriodicBatching;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Serilog.Core;
-using Serilog.Sinks.PeriodicBatching;
 
 namespace Serilog.Sinks.MongoDB
 {
@@ -36,11 +35,6 @@ namespace Serilog.Sinks.MongoDB
         readonly IMongoDatabase _mongoDatabase;
 
         /// <summary>
-        /// The default name for the log collection.
-        /// </summary>
-        public static readonly string DefaultCollectionName = "log";
-
-        /// <summary>
         /// A reasonable default for the number of events posted in
         /// each batch.
         /// </summary>
@@ -52,6 +46,11 @@ namespace Serilog.Sinks.MongoDB
         public static readonly TimeSpan DefaultPeriod = TimeSpan.FromSeconds(2);
 
         /// <summary>
+        /// The default name for the log collection.
+        /// </summary>
+        public static readonly string DefaultCollectionName = "log";
+
+        /// <summary>
         /// Construct a sink posting to the specified database.
         /// </summary>
         /// <param name="databaseUrl">The URL of a MongoDB database.</param>
@@ -61,8 +60,9 @@ namespace Serilog.Sinks.MongoDB
         /// <param name="collectionName">Name of the MongoDb collection to use for the log. Default is "log".</param>
         /// <param name="collectionCreationOptions">Collection Creation Options for the log collection creation.</param>
         public MongoDBSink(string databaseUrl, int batchPostingLimit, TimeSpan period, IFormatProvider formatProvider, string collectionName, CreateCollectionOptions collectionCreationOptions)
-           : this(DatabaseFromMongoUrl(databaseUrl), batchPostingLimit, period, formatProvider, collectionName, collectionCreationOptions)
-        { }
+            : this (DatabaseFromMongoUrl(databaseUrl), batchPostingLimit, period, formatProvider, collectionName, collectionCreationOptions)
+        {
+        }
 
         /// <summary>
         /// Construct a sink posting to a specified database.
@@ -141,12 +141,12 @@ namespace Serilog.Sinks.MongoDB
                 formatProvider: _formatProvider);
 
             var delimStart = "{";
-            foreach (var e in events)
+            foreach (var logEvent in events)
             {
                 payload.Write(delimStart);
-                formatter.Format(e, payload);
+                formatter.Format(logEvent, payload);
                 payload.Write(",\"UtcTimestamp\":\"{0:u}\"}}",
-                              e.Timestamp.ToUniversalTime().DateTime);
+                              logEvent.Timestamp.ToUniversalTime().DateTime);
                 delimStart = ",{";
             }
 

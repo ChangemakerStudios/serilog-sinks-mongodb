@@ -1,7 +1,7 @@
 ﻿{
   "version": "2.0.0-beta-*",
   "description": "The MongoDB sink for Serilog",
-  "authors": [ "Serilog Contributors" ],
+  "authors": [ "Kiran Makkapati", "Serilog Contributors" ],
   "tags": [ "serilog", "mongodb" ],
   "projectUrl": "http://serilog.net",
   "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0",
