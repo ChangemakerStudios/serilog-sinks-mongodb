@@ -21,13 +21,14 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Serilog.Core;
+using Serilog.Sinks.PeriodicBatching;
 
 namespace Serilog.Sinks.MongoDB
 {
     /// <summary>
     /// Writes log events as documents to a MongoDB database.
     /// </summary>
-    public class MongoDBSink : ILogEventSink
+    public class MongoDBSink : PeriodicBatchingSink
     {
         readonly string _collectionName;
         readonly CreateCollectionOptions _collectionCreationOptions;
@@ -40,25 +41,40 @@ namespace Serilog.Sinks.MongoDB
         public static readonly string DefaultCollectionName = "log";
 
         /// <summary>
+        /// A reasonable default for the number of events posted in
+        /// each batch.
+        /// </summary>
+        public const int DefaultBatchPostingLimit = 50;
+
+        /// <summary>
+        /// A reasonable default time to wait between checking for event batches.
+        /// </summary>
+        public static readonly TimeSpan DefaultPeriod = TimeSpan.FromSeconds(2);
+
+        /// <summary>
         /// Construct a sink posting to the specified database.
         /// </summary>
         /// <param name="databaseUrl">The URL of a MongoDB database.</param>
+        /// <param name="batchPostingLimit">The maximum number of events to post in a single batch.</param>
+        /// <param name="period">The time to wait between checking for event batches.</param>
         /// <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
         /// <param name="collectionName">Name of the MongoDb collection to use for the log. Default is "log".</param>
         /// <param name="collectionCreationOptions">Collection Creation Options for the log collection creation.</param>
-        public MongoDBSink(string databaseUrl, IFormatProvider formatProvider, string collectionName, CreateCollectionOptions collectionCreationOptions)
-            : this (DatabaseFromMongoUrl(databaseUrl), formatProvider, collectionName, collectionCreationOptions)
-        {
-        }
+        public MongoDBSink(string databaseUrl, int batchPostingLimit, TimeSpan period, IFormatProvider formatProvider, string collectionName, CreateCollectionOptions collectionCreationOptions)
+           : this(DatabaseFromMongoUrl(databaseUrl), batchPostingLimit, period, formatProvider, collectionName, collectionCreationOptions)
+        { }
 
         /// <summary>
         /// Construct a sink posting to a specified database.
         /// </summary>
         /// <param name="database">The MongoDB database.</param>
+        /// <param name="batchPostingLimit">The maximum number of events to post in a single batch.</param>
+        /// <param name="period">The time to wait between checking for event batches.</param>
         /// <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
         /// <param name="collectionName">Name of the MongoDb collection to use for the log. Default is "log".</param>
         /// <param name="collectionCreationOptions">Collection Creation Options for the log collection creation.</param>
-        public MongoDBSink(IMongoDatabase database, IFormatProvider formatProvider, string collectionName, CreateCollectionOptions collectionCreationOptions)
+        public MongoDBSink(IMongoDatabase database, int batchPostingLimit, TimeSpan period, IFormatProvider formatProvider, string collectionName, CreateCollectionOptions collectionCreationOptions)
+            : base(batchPostingLimit, period)
         {
             if (database == null) throw new ArgumentNullException("database");
 
@@ -109,7 +125,13 @@ namespace Serilog.Sinks.MongoDB
         {
         }
 
-        public void Emit(LogEvent logEvent)
+        /// <summary>
+        /// Emit a batch of log events, running to completion synchronously.
+        /// </summary>
+        /// <param name="events">The events to emit.</param>
+        /// <remarks>Override either <see cref="PeriodicBatchingSink.EmitBatch"/> or <see cref="PeriodicBatchingSink.EmitBatchAsync"/>,
+        /// not both.</remarks>
+        protected override void EmitBatch(IEnumerable<LogEvent> events)
         {
             var payload = new StringWriter();
             payload.Write("{\"d\":[");
@@ -119,14 +141,14 @@ namespace Serilog.Sinks.MongoDB
                 formatProvider: _formatProvider);
 
             var delimStart = "{";
-            //foreach (var e in events)
-            //{
+            foreach (var e in events)
+            {
                 payload.Write(delimStart);
-                formatter.Format(logEvent, payload);
+                formatter.Format(e, payload);
                 payload.Write(",\"UtcTimestamp\":\"{0:u}\"}}",
-                              logEvent.Timestamp.ToUniversalTime().DateTime);
-                //delimStart = ",{";
-            //}
+                              e.Timestamp.ToUniversalTime().DateTime);
+                delimStart = ",{";
+            }
 
             payload.Write("]}");
             

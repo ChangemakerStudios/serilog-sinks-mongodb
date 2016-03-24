@@ -7,7 +7,8 @@
   "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0",
   "iconUrl": "http://serilog.net/images/serilog-sink-nuget.png",
   "dependencies": {
-    "Serilog": "2.0.0-beta-511"
+    "Serilog": "2.0.0-beta-511",
+    "Serilog.Sinks.PeriodicBatching": "2.0.0-beta-700"
   },
 
   "frameworks": {
