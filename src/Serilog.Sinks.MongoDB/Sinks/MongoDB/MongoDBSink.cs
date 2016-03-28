@@ -151,7 +151,7 @@ namespace Serilog.Sinks.MongoDB
             }
 
             payload.Write("]}");
-            
+
             var bson = BsonDocument.Parse(payload.ToString());
             var docs = bson["d"].AsBsonArray.Select(x => x.AsBsonDocument);
             Task.WaitAll(GetLogCollection().InsertManyAsync(docs));
