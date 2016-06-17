@@ -1,18 +1,20 @@
 ﻿{
-  "version": "2.0.0-beta-*",
+  "version": "3.0.0-beta-25",
   "description": "The MongoDB sink for Serilog",
   "authors": [ "Kiran Makkapati", "Serilog Contributors" ],
-  "tags": [ "serilog", "mongodb" ],
-  "projectUrl": "http://serilog.net",
-  "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0",
-  "iconUrl": "http://serilog.net/images/serilog-sink-nuget.png",
+  "packOptions": {
+    "tags": [ "serilog", "mongodb" ],
+    "projectUrl": "http://serilog.net",
+    "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0",
+    "iconUrl": "http://serilog.net/images/serilog-sink-nuget.png"
+  },
   "dependencies": {
-    "Serilog": "2.0.0-beta-511",
-    "Serilog.Sinks.PeriodicBatching": "2.0.0-beta-700"
+    "Serilog": "2.0.0-rc-619",
+    "Serilog.Sinks.PeriodicBatching": "2.0.0-rc-707"
   },
 
   "frameworks": {
-    "dnx46": {
+    "net46": {
       "dependencies": {
         "MongoDB.Driver": "2.2.3"
       }

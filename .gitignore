@@ -183,3 +183,5 @@ UpgradeLog*.htm
 # Microsoft Fakes
 FakesAssemblies/
 project.lock.json
+/.vs
+/artifacts/Serilog.Sinks.MongoDB.xproj/testbin
