@@ -5,7 +5,7 @@
 A Serilog sink that writes events as documents to [MongoDB](http://mongodb.org).
 
 **Package** - [Serilog.Sinks.MongoDB](http://nuget.org/packages/serilog.sinks.mongodb)
-| **Platforms** - .NET 4.5
+| **Platforms** - .NET 4.6
 
 You'll need to create a collection on your MongoDB server. In the example shown, the database in use is called `logs`. The collection name is `log` and is created implicitely.
 
