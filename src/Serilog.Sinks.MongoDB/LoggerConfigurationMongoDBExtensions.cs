@@ -48,15 +48,10 @@ namespace Serilog
             if (databaseUrl == null) throw new ArgumentNullException("databaseUrl");
 
             var defaultedPeriod = period ?? MongoDBSink.DefaultPeriod;
-            return loggerConfiguration.Sink(
-                new MongoDBSink(
-                    databaseUrl,
-                    batchPostingLimit,
-                    defaultedPeriod,
-                    formatProvider,
-                    MongoDBSink.DefaultCollectionName,
-                    new CreateCollectionOptions()),
-                restrictedToMinimumLevel);
+            return
+                loggerConfiguration.Sink(
+                    new MongoDBSink(databaseUrl, batchPostingLimit, defaultedPeriod, formatProvider, MongoDBSink.DefaultCollectionName, null),
+                    restrictedToMinimumLevel);
         }
 
         /// <summary>
@@ -82,15 +77,10 @@ namespace Serilog
             if (database == null) throw new ArgumentNullException("database");
 
             var defaultedPeriod = period ?? MongoDBSink.DefaultPeriod;
-            return loggerConfiguration.Sink(
-                new MongoDBSink(
-                    database,
-                    batchPostingLimit,
-                    defaultedPeriod,
-                    formatProvider,
-                    MongoDBSink.DefaultCollectionName,
-                    new CreateCollectionOptions()),
-                restrictedToMinimumLevel);
+            return
+                loggerConfiguration.Sink(
+                    new MongoDBSink(database, batchPostingLimit, defaultedPeriod, formatProvider, MongoDBSink.DefaultCollectionName, null),
+                    restrictedToMinimumLevel);
         }
 
         /// <summary>
