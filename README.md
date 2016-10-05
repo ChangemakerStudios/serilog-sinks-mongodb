@@ -23,7 +23,7 @@ var log = new LoggerConfiguration()
     .CreateLogger();
 ```
 
-Additionally, you can utilize a [Capped Collection](https://docs.mongodb.org/manual/core/capped-collections/) which is a "rolling" collection with a max cap.
+Additionally, you can utilize a [Capped Collection](https://docs.mongodb.org/manual/core/capped-collections/).
 
 ```csharp
 // basic with custom collection name
