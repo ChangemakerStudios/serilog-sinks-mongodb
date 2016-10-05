@@ -79,7 +79,7 @@ namespace Serilog.Helpers
 
             var payload = new StringWriter();
 
-            payload.Write("{\"logEvents\":[");
+            payload.Write(@"{""logEvents"":[");
 
             var delimStart = "{";
 
@@ -87,7 +87,7 @@ namespace Serilog.Helpers
             {
                 payload.Write(delimStart);
                 formatter.Format(logEvent, payload);
-                payload.Write(",\"UtcTimestamp\":\"{0:u}\"}}", logEvent.Timestamp.ToUniversalTime().DateTime);
+                payload.Write(@",""UtcTimestamp"":""{0:u}""}}", logEvent.Timestamp.ToUniversalTime().DateTime);
                 delimStart = ",{";
             }
 
