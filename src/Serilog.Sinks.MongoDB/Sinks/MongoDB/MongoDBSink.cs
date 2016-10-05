@@ -1,11 +1,11 @@
 ﻿// Copyright 2014-2016 Serilog Contributors
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Threading.Tasks;
 
 using MongoDB.Bson;
@@ -38,20 +39,20 @@ namespace Serilog.Sinks.MongoDB
         /// <summary>
         /// Construct a sink posting to the specified database.
         /// </summary>
-        /// <param name="databaseUrl">The URL of a MongoDB database.</param>
+        /// <param name="databaseUrlOrConnStrName">The URL of a MongoDB database, or connection string name containing the URL.</param>
         /// <param name="batchPostingLimit">The maximum number of events to post in a single batch.</param>
         /// <param name="period">The time to wait between checking for event batches.</param>
         /// <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
         /// <param name="collectionName">Name of the MongoDb collection to use for the log. Default is "log".</param>
         /// <param name="collectionCreationOptions">Collection Creation Options for the log collection creation.</param>
         public MongoDBSink(
-            string databaseUrl,
+            string databaseUrlOrConnStrName,
             int batchPostingLimit,
             TimeSpan period,
             IFormatProvider formatProvider,
             string collectionName,
             CreateCollectionOptions collectionCreationOptions)
-            : this(DatabaseFromMongoUrl(databaseUrl), batchPostingLimit, period, formatProvider, collectionName, collectionCreationOptions)
+            : this(DatabaseFromMongoUrl(databaseUrlOrConnStrName), batchPostingLimit, period, formatProvider, collectionName, collectionCreationOptions)
         {
         }
 
@@ -102,14 +103,27 @@ namespace Serilog.Sinks.MongoDB
         /// <summary>
         /// Get the MongoDatabase for a specified database url
         /// </summary>
-        /// <param name="databaseUrl">The URL of a MongoDB database.</param>
+        /// <param name="databaseUrlOrConnStrName">The URL of a MongoDB database, or connection string name containing the URL.</param>
         /// <returns>The Mongodatabase</returns>
-        private static IMongoDatabase DatabaseFromMongoUrl(string databaseUrl)
+        private static IMongoDatabase DatabaseFromMongoUrl(string databaseUrlOrConnStrName)
         {
-            if (databaseUrl == null)
+            if (databaseUrlOrConnStrName == null)
                 throw new ArgumentNullException("databaseUrl");
 
-            var mongoUrl = new MongoUrl(databaseUrl);
+            MongoUrl mongoUrl = null;
+            try
+            {
+                mongoUrl = MongoUrl.Create(databaseUrlOrConnStrName);
+            }
+            catch (MongoConfigurationException)
+            {
+                var connectionString = ConfigurationManager.ConnectionStrings[databaseUrlOrConnStrName];
+                if (connectionString == null)
+                    throw new InvalidOperationException(string.Format("Invalid connection string key: {0}", databaseUrlOrConnStrName));
+
+                mongoUrl = MongoUrl.Create(connectionString.ConnectionString);
+            }
+
             var mongoClient = new MongoClient(mongoUrl);
             return mongoClient.GetDatabase(mongoUrl.DatabaseName);
         }
