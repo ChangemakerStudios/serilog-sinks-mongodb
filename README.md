@@ -8,30 +8,31 @@ A Serilog sink that writes events as documents to [MongoDB](http://mongodb.org).
 | **Platforms** - .NET 4.6
 
 
-In the example shown, the database in use is called `logs`. The default collection name is `log`, but a custom name can be supplied with the optional `CollectionName` parameter.
+In the example shown, the sink will write to the database `logs`. The default collection name is `log`, but a custom collection can be supplied with the optional `CollectionName` parameter.
+The database and collection will be created if they do not exist.
 
 ```csharp
-// basic
+// basic using default collection `log`
 var log = new LoggerConfiguration()
     .WriteTo.MongoDB("mongodb://mymongodb/logs")
     .CreateLogger();
 
 // custom collection name
 var log = new LoggerConfiguration()
-    .WriteTo.MongoDB("mongodb://mymongodb/logs", collectionName: "myapplogs")
+    .WriteTo.MongoDB("mongodb://mymongodb/logs", collectionName: "applog")
     .CreateLogger();
 ```
 
-Additionally, you can utilize a [Capped Collection](https://docs.mongodb.org/manual/core/capped-collections/) which creates a special "rolling" collection in MongoDB.
+Additionally, you can utilize a [Capped Collection](https://docs.mongodb.org/manual/core/capped-collections/) which is a "rolling" collection with a max cap.
 
 ```csharp
-// basic
+// basic with custom collection name
 var log = new LoggerConfiguration()
-    .WriteTo.MongoDBCapped("mongodb://mymongodb/logs")
+    .WriteTo.MongoDBCapped("mongodb://mymongodb/logs", collectionName: "rollingapplog")
     .CreateLogger();
 
 // optional parameters cappedMaxSizeMb and cappedMaxDocuments specified
 var log = new LoggerConfiguration()
-    .WriteTo.MongoDBCapped("mongodb://mymongodb/logs", cappedMaxSizeMb: 100, cappedMaxDocuments: 1000)
+    .WriteTo.MongoDBCapped("mongodb://mymongodb/logs", cappedMaxSizeMb: 50, cappedMaxDocuments: 1000)
     .CreateLogger();
 ```
