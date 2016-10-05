@@ -12,12 +12,12 @@ In the example shown, the sink will write to the database `logs`. The default co
 The database and collection will be created if they do not exist.
 
 ```csharp
-// basic using default collection `log`
+// basic usage defaults to writing to `log` collection
 var log = new LoggerConfiguration()
     .WriteTo.MongoDB("mongodb://mymongodb/logs")
     .CreateLogger();
 
-// custom collection name
+// creates custom collection `applog`
 var log = new LoggerConfiguration()
     .WriteTo.MongoDB("mongodb://mymongodb/logs", collectionName: "applog")
     .CreateLogger();
