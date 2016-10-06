@@ -15,7 +15,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Threading.Tasks;
 
 using MongoDB.Bson;
@@ -112,18 +111,22 @@ namespace Serilog.Sinks.MongoDB
 
             MongoUrl mongoUrl;
 
+#if NET_45
             try
             {
                 mongoUrl = MongoUrl.Create(databaseUrlOrConnStrName);
             }
             catch (MongoConfigurationException)
             {
-                var connectionString = ConfigurationManager.ConnectionStrings[databaseUrlOrConnStrName];
+                var connectionString = System.Configuration.ConfigurationManager.ConnectionStrings[databaseUrlOrConnStrName];
                 if (connectionString == null)
                     throw new KeyNotFoundException($"Invalid database url or connection string key: {databaseUrlOrConnStrName}");
 
                 mongoUrl = MongoUrl.Create(connectionString.ConnectionString);
             }
+#else
+            mongoUrl = MongoUrl.Create(databaseUrlOrConnStrName);
+#endif
 
             var mongoClient = new MongoClient(mongoUrl);
             return mongoClient.GetDatabase(mongoUrl.DatabaseName);
