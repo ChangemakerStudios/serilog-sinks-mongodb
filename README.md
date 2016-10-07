@@ -5,7 +5,7 @@
 A Serilog sink that writes events as documents to [MongoDB](http://mongodb.org).
 
 **Package** - [Serilog.Sinks.MongoDB](http://nuget.org/packages/serilog.sinks.mongodb)
-| **Platforms** - .NET 4.6
+| **Platforms** - .NET 4.6, .NETStandard 1.5
 
 
 In the example shown, the sink will write to the database `logs`. The default collection name is `log`, but a custom collection can be supplied with the optional `CollectionName` parameter.

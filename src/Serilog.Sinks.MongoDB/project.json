@@ -22,6 +22,11 @@
       "dependencies": {
         "MongoDB.Driver": "2.2.3"
       }
+    },
+    "netstandard1.5": {
+      "dependencies": {
+        "MongoDB.Driver": "2.3.0"
+      }
     }
   }
 }
