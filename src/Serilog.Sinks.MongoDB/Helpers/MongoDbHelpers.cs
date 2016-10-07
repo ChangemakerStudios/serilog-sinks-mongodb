@@ -57,7 +57,15 @@ namespace Serilog.Helpers
 
             if (!database.CollectionExists(collectionName))
             {
-                database.CreateCollection(collectionName, collectionCreationOptions);
+                try
+                {
+                    database.CreateCollection(collectionName, collectionCreationOptions);
+                }
+                catch(MongoCommandException e)
+                {
+                    if (!e.ErrorMessage.Equals("collection already exists"))
+                        throw;
+                }
             }
         }
 
