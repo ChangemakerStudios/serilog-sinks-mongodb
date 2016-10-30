@@ -40,14 +40,14 @@ namespace Serilog
         public static LoggerConfiguration MongoDB(
             this LoggerSinkConfiguration loggerConfiguration,
             string databaseUrl,
-            string collectionName = null,
+            string collectionName = MongoDBSink.DefaultCollectionName,
             LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum,
-            int? batchPostingLimit = null,
+            int batchPostingLimit = MongoDBSink.DefaultBatchPostingLimit,
             TimeSpan? period = null,
             IFormatProvider formatProvider = null)
         {
             if (loggerConfiguration == null) throw new ArgumentNullException(nameof(loggerConfiguration));
-            if (databaseUrl == null) throw new ArgumentNullException(nameof(databaseUrl));
+            if (string.IsNullOrWhiteSpace(databaseUrl)) throw new ArgumentNullException(nameof(databaseUrl));
 
             return
                 loggerConfiguration.Sink(
@@ -71,8 +71,8 @@ namespace Serilog
             this LoggerSinkConfiguration loggerConfiguration,
             IMongoDatabase database,
             LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum,
-            string collectionName = null,
-            int? batchPostingLimit = null,
+            string collectionName = MongoDBSink.DefaultCollectionName,
+            int batchPostingLimit = MongoDBSink.DefaultBatchPostingLimit,
             TimeSpan? period = null,
             IFormatProvider formatProvider = null)
         {
@@ -105,14 +105,14 @@ namespace Serilog
             LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum,
             long cappedMaxSizeMb = 50,
             long? cappedMaxDocuments = null,
-            string collectionName = null,
-            int? batchPostingLimit = null,
+            string collectionName = MongoDBSink.DefaultCollectionName,
+            int batchPostingLimit = MongoDBSink.DefaultBatchPostingLimit,
             TimeSpan? period = null,
             IFormatProvider formatProvider = null)
         {
 
             if (loggerConfiguration == null) throw new ArgumentNullException(nameof(loggerConfiguration));
-            if (databaseUrl == null) throw new ArgumentNullException(nameof(databaseUrl));
+            if (string.IsNullOrWhiteSpace(databaseUrl)) throw new ArgumentNullException(nameof(databaseUrl));
 
             var options = new CreateCollectionOptions
             {
@@ -120,10 +120,7 @@ namespace Serilog
                 MaxSize = cappedMaxSizeMb * 1024 * 1024
             };
 
-            if (cappedMaxDocuments.HasValue)
-            {
-                options.MaxDocuments = cappedMaxDocuments.Value;
-            }
+            if (cappedMaxDocuments.HasValue) options.MaxDocuments = cappedMaxDocuments.Value;
 
             return loggerConfiguration.Sink(
                 new MongoDBSink(
@@ -156,8 +153,8 @@ namespace Serilog
             LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum,
             long cappedMaxSizeMb = 50,
             long? cappedMaxDocuments = null,
-            string collectionName = null,
-            int? batchPostingLimit = null,
+            string collectionName = MongoDBSink.DefaultCollectionName,
+            int batchPostingLimit = MongoDBSink.DefaultBatchPostingLimit,
             TimeSpan? period = null,
             IFormatProvider formatProvider = null)
         {
@@ -170,10 +167,7 @@ namespace Serilog
                 MaxSize = cappedMaxSizeMb * 1024 * 1024
             };
 
-            if (cappedMaxDocuments.HasValue)
-            {
-                options.MaxDocuments = cappedMaxDocuments.Value;
-            }
+            if (cappedMaxDocuments.HasValue) options.MaxDocuments = cappedMaxDocuments.Value;
 
             return loggerConfiguration.Sink(
                 new MongoDBSink(

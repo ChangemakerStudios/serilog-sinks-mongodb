@@ -1,32 +1,31 @@
 {
-  "version": "3.1.0-*",
-  "description": "The MongoDB sink for Serilog",
-  "authors": [ "Kiran Makkapati", "Serilog Contributors" ],
-  "packOptions": {
-    "tags": [ "serilog", "mongodb" ],
-    "projectUrl": "http://serilog.net",
-    "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0",
-    "iconUrl": "http://serilog.net/images/serilog-sink-nuget.png"
-  },
+	"version": "3.1.0-*",
+	"description": "The MongoDB sink for Serilog",
+	"authors": [ "Kiran Makkapati", "Serilog Contributors" ],
+	"packOptions": {
+		"tags": [ "serilog", "mongodb" ],
+		"projectUrl": "http://serilog.net",
+		"licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0",
+		"iconUrl": "http://serilog.net/images/serilog-sink-nuget.png"
+	},
 
-  "dependencies": {
-    "Serilog": "2.1",
-    "Serilog.Sinks.PeriodicBatching": "2.0"
-  },
+	"dependencies": {
+		"MongoDB.Driver": "2.3.0",
+		"Serilog": "2.3.0",
+		"Serilog.Sinks.PeriodicBatching": "2.1.0"
+	},
 
-  "frameworks": {
-    "net4.5": {
-      "frameworkAssemblies": {
-        "System.Configuration": "4.0"
-      },
-      "dependencies": {
-        "MongoDB.Driver": "2.2.3"
-      }
-    },
-    "netstandard1.5": {
-      "dependencies": {
-        "MongoDB.Driver": "2.3.0"
-      }
-    }
-  }
+	"frameworks": {
+		"net4.5": {
+			"frameworkAssemblies": {
+				"System.Configuration": "4.0"
+			},
+			"dependencies": {
+			}
+		},
+		"netstandard1.5": {
+			"dependencies": {
+			}
+		}
+	}
 }

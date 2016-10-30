@@ -46,10 +46,10 @@ namespace Serilog.Sinks.MongoDB
         /// <param name="collectionCreationOptions">Collection Creation Options for the log collection creation.</param>
         public MongoDBSink(
             string databaseUrlOrConnStrName,
-            int? batchPostingLimit = null,
+            int batchPostingLimit = DefaultBatchPostingLimit,
             TimeSpan? period = null,
             IFormatProvider formatProvider = null,
-            string collectionName = null,
+            string collectionName = DefaultCollectionName,
             CreateCollectionOptions collectionCreationOptions = null)
             : this(DatabaseFromMongoUrl(databaseUrlOrConnStrName), batchPostingLimit, period, formatProvider, collectionName, collectionCreationOptions)
         {
@@ -66,18 +66,17 @@ namespace Serilog.Sinks.MongoDB
         /// <param name="collectionCreationOptions">Collection Creation Options for the log collection creation.</param>
         public MongoDBSink(
             IMongoDatabase database,
-            int? batchPostingLimit = null,
+            int batchPostingLimit = DefaultBatchPostingLimit,
             TimeSpan? period = null,
             IFormatProvider formatProvider = null,
-            string collectionName = null,
+            string collectionName = DefaultCollectionName,
             CreateCollectionOptions collectionCreationOptions = null)
-            : base(batchPostingLimit ?? DefaultBatchPostingLimit, period ?? DefaultPeriod)
+            : base(batchPostingLimit, period ?? DefaultPeriod)
         {
-            if (database == null)
-                throw new ArgumentNullException(nameof(database));
+            if (database == null) throw new ArgumentNullException(nameof(database));
 
             this._mongoDatabase = database;
-            this._collectionName = collectionName ?? DefaultCollectionName;
+            this._collectionName = collectionName;
             this._mongoDbJsonFormatter = new MongoDBJsonFormatter(true, renderMessage: true, formatProvider: formatProvider);
 
             this._mongoDatabase.VerifyCollectionExists(this._collectionName, collectionCreationOptions);
@@ -97,7 +96,7 @@ namespace Serilog.Sinks.MongoDB
         /// <summary>
         /// The default name for the log collection.
         /// </summary>
-        public static readonly string DefaultCollectionName = "log";
+        public const string DefaultCollectionName = "log";
 
         /// <summary>
         /// Get the MongoDatabase for a specified database url
@@ -106,7 +105,7 @@ namespace Serilog.Sinks.MongoDB
         /// <returns>The Mongodatabase</returns>
         static IMongoDatabase DatabaseFromMongoUrl(string databaseUrlOrConnStrName)
         {
-            if (databaseUrlOrConnStrName == null)
+            if (string.IsNullOrWhiteSpace(databaseUrlOrConnStrName))
                 throw new ArgumentNullException(nameof(databaseUrlOrConnStrName));
 
             MongoUrl mongoUrl;

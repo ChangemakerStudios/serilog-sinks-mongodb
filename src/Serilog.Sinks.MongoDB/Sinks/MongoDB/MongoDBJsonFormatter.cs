@@ -76,19 +76,17 @@ namespace Serilog.Sinks.MongoDB
                 precedingDelimiter = ",";
             }
             else
-            {
                 base.WriteJsonProperty(name, value, ref precedingDelimiter, output);
-            }
         }
 
         private static void WriteOffset(DateTimeOffset value, TextWriter output)
         {
-            output.Write("{{ \"$date\" : {0} }}", BsonUtils.ToMillisecondsSinceEpoch(value.UtcDateTime));
+            output.Write($"{{ \"$date\" : {BsonUtils.ToMillisecondsSinceEpoch(value.UtcDateTime)} }}");
         }
 
         private static void WriteDateTime(DateTime value, TextWriter output)
         {
-            output.Write("{{ \"$date\" : {0} }}", BsonUtils.ToMillisecondsSinceEpoch(value));
+            output.Write($"{{ \"$date\" : {BsonUtils.ToMillisecondsSinceEpoch(value)} }}");
         }
     }
 }

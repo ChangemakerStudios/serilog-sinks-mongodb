@@ -38,7 +38,7 @@ namespace Serilog.Helpers
             return
                 database.ListCollections(new ListCollectionsOptions { Filter = new BsonDocument { { "name", collectionName } } })
                     .ToList()
-                    .Count > 0;
+                    .Any();
         }
 
         /// <summary>
@@ -49,23 +49,19 @@ namespace Serilog.Helpers
         /// <param name="collectionCreationOptions">The collection creation options.</param>
         internal static void VerifyCollectionExists(this IMongoDatabase database, string collectionName, CreateCollectionOptions collectionCreationOptions = null)
         {
-            if (database == null)
-                throw new ArgumentNullException(nameof(database));
+            if (database == null) throw new ArgumentNullException(nameof(database));
 
-            if (collectionName == null)
-                throw new ArgumentNullException(nameof(collectionName));
+            if (collectionName == null) throw new ArgumentNullException(nameof(collectionName));
 
-            if (!database.CollectionExists(collectionName))
+            if (database.CollectionExists(collectionName)) return;
+
+            try
             {
-                try
-                {
-                    database.CreateCollection(collectionName, collectionCreationOptions);
-                }
-                catch(MongoCommandException e)
-                {
-                    if (!e.ErrorMessage.Equals("collection already exists"))
-                        throw;
-                }
+                database.CreateCollection(collectionName, collectionCreationOptions);
+            }
+            catch (MongoCommandException e)
+            {
+                if (!e.ErrorMessage.Equals("collection already exists")) throw;
             }
         }
 
@@ -79,11 +75,9 @@ namespace Serilog.Helpers
         /// </exception>
         internal static IReadOnlyCollection<BsonDocument> GenerateBsonDocuments(this IEnumerable<LogEvent> events, JsonFormatter formatter)
         {
-            if (events == null)
-                throw new ArgumentNullException(nameof(events));
+            if (events == null) throw new ArgumentNullException(nameof(events));
 
-            if (formatter == null)
-                throw new ArgumentNullException(nameof(formatter));
+            if (formatter == null) throw new ArgumentNullException(nameof(formatter));
 
             var payload = new StringWriter();
 
