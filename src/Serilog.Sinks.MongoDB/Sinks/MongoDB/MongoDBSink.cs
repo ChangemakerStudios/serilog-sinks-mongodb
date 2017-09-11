@@ -50,8 +50,9 @@ namespace Serilog.Sinks.MongoDB
             TimeSpan? period = null,
             IFormatProvider formatProvider = null,
             string collectionName = DefaultCollectionName,
-            CreateCollectionOptions collectionCreationOptions = null)
-            : this(DatabaseFromMongoUrl(databaseUrlOrConnStrName), batchPostingLimit, period, formatProvider, collectionName, collectionCreationOptions)
+            CreateCollectionOptions collectionCreationOptions = null,
+            MongoDBJsonFormatter mongoDBJsonFormatter = null)
+            : this(DatabaseFromMongoUrl(databaseUrlOrConnStrName), batchPostingLimit, period, formatProvider, collectionName, collectionCreationOptions, mongoDBJsonFormatter)
         {
         }
 
@@ -70,14 +71,15 @@ namespace Serilog.Sinks.MongoDB
             TimeSpan? period = null,
             IFormatProvider formatProvider = null,
             string collectionName = DefaultCollectionName,
-            CreateCollectionOptions collectionCreationOptions = null)
+            CreateCollectionOptions collectionCreationOptions = null,
+            MongoDBJsonFormatter mongoDBJsonFormatter = null)
             : base(batchPostingLimit, period ?? DefaultPeriod)
         {
             if (database == null) throw new ArgumentNullException(nameof(database));
 
             this._mongoDatabase = database;
             this._collectionName = collectionName;
-            this._mongoDbJsonFormatter = new MongoDBJsonFormatter(true, renderMessage: true, formatProvider: formatProvider);
+            this._mongoDbJsonFormatter = mongoDBJsonFormatter ?? new MongoDBJsonFormatter(true, renderMessage: true, formatProvider: formatProvider);
 
             this._mongoDatabase.VerifyCollectionExists(this._collectionName, collectionCreationOptions);
         }
