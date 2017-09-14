@@ -21,7 +21,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 
 using Serilog.Events;
-using Serilog.Formatting.Json;
+using Serilog.Formatting;
 
 namespace Serilog.Helpers
 {
@@ -73,7 +73,7 @@ namespace Serilog.Helpers
         /// <returns></returns>
         /// <exception cref="ArgumentNullException">
         /// </exception>
-        internal static IReadOnlyCollection<BsonDocument> GenerateBsonDocuments(this IEnumerable<LogEvent> events, JsonFormatter formatter)
+        internal static IReadOnlyCollection<BsonDocument> GenerateBsonDocuments(this IEnumerable<LogEvent> events, ITextFormatter formatter)
         {
             if (events == null) throw new ArgumentNullException(nameof(events));
 
