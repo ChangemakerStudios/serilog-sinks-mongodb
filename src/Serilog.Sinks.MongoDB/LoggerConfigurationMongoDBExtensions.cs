@@ -17,6 +17,7 @@ using Serilog.Configuration;
 using Serilog.Events;
 using Serilog.Sinks.MongoDB;
 using MongoDB.Driver;
+using Serilog.Formatting;
 
 namespace Serilog
 {
@@ -35,6 +36,7 @@ namespace Serilog
         /// <param name="batchPostingLimit">The maximum number of events to post in a single batch.</param>
         /// <param name="period">The time to wait between checking for event batches.</param>
         /// <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
+        /// <param name="mongoDBJsonFormatter">Formatter to produce json for MongoDB.</param>
         /// <returns>Logger configuration, allowing configuration to continue.</returns>
         /// <exception cref="ArgumentNullException">A required parameter is null.</exception>
         public static LoggerConfiguration MongoDB(
@@ -44,14 +46,15 @@ namespace Serilog
             LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum,
             int batchPostingLimit = MongoDBSink.DefaultBatchPostingLimit,
             TimeSpan? period = null,
-            IFormatProvider formatProvider = null)
+            IFormatProvider formatProvider = null,
+            ITextFormatter mongoDBJsonFormatter = null)
         {
             if (loggerConfiguration == null) throw new ArgumentNullException(nameof(loggerConfiguration));
             if (string.IsNullOrWhiteSpace(databaseUrl)) throw new ArgumentNullException(nameof(databaseUrl));
 
             return
                 loggerConfiguration.Sink(
-                    new MongoDBSink(databaseUrl, batchPostingLimit, period, formatProvider, collectionName),
+                    new MongoDBSink(databaseUrl, batchPostingLimit, period, formatProvider, collectionName, null, mongoDBJsonFormatter),
                     restrictedToMinimumLevel);
         }
 
@@ -65,6 +68,7 @@ namespace Serilog
         /// <param name="batchPostingLimit">The maximum number of events to post in a single batch.</param>
         /// <param name="period">The time to wait between checking for event batches.</param>
         /// <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
+        /// <param name="mongoDBJsonFormatter">Formatter to produce json for MongoDB.</param>
         /// <returns>Logger configuration, allowing configuration to continue.</returns>
         /// <exception cref="ArgumentNullException">A required parameter is null.</exception>
         public static LoggerConfiguration MongoDB(
@@ -74,14 +78,15 @@ namespace Serilog
             string collectionName = MongoDBSink.DefaultCollectionName,
             int batchPostingLimit = MongoDBSink.DefaultBatchPostingLimit,
             TimeSpan? period = null,
-            IFormatProvider formatProvider = null)
+            IFormatProvider formatProvider = null,
+            ITextFormatter mongoDBJsonFormatter = null)
         {
             if (loggerConfiguration == null) throw new ArgumentNullException(nameof(loggerConfiguration));
             if (database == null) throw new ArgumentNullException(nameof(database));
 
             return
                 loggerConfiguration.Sink(
-                    new MongoDBSink(database, batchPostingLimit, period, formatProvider, collectionName),
+                    new MongoDBSink(database, batchPostingLimit, period, formatProvider, collectionName, null, mongoDBJsonFormatter),
                     restrictedToMinimumLevel);
         }
 
@@ -97,6 +102,7 @@ namespace Serilog
         /// <param name="batchPostingLimit">The maximum number of events to post in a single batch.</param>
         /// <param name="period">The time to wait between checking for event batches.</param>
         /// <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
+        /// <param name="mongoDBJsonFormatter">Formatter to produce json for MongoDB.</param>
         /// <returns>Logger configuration, allowing configuration to continue.</returns>
         /// <exception cref="ArgumentNullException">A required parameter is null.</exception>
         public static LoggerConfiguration MongoDBCapped(
@@ -108,7 +114,8 @@ namespace Serilog
             string collectionName = MongoDBSink.DefaultCollectionName,
             int batchPostingLimit = MongoDBSink.DefaultBatchPostingLimit,
             TimeSpan? period = null,
-            IFormatProvider formatProvider = null)
+            IFormatProvider formatProvider = null,
+            ITextFormatter mongoDBJsonFormatter = null)
         {
 
             if (loggerConfiguration == null) throw new ArgumentNullException(nameof(loggerConfiguration));
@@ -129,7 +136,8 @@ namespace Serilog
                     period,
                     formatProvider,
                     collectionName,
-                    options),
+                    options,
+                    mongoDBJsonFormatter),
                 restrictedToMinimumLevel);
         }
 
@@ -145,6 +153,7 @@ namespace Serilog
         /// <param name="batchPostingLimit">The maximum number of events to post in a single batch.</param>
         /// <param name="period">The time to wait between checking for event batches.</param>
         /// <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
+        /// <param name="mongoDBJsonFormatter">Formatter to produce json for MongoDB.</param>
         /// <returns>Logger configuration, allowing configuration to continue.</returns>
         /// <exception cref="ArgumentNullException">A required parameter is null.</exception>
         public static LoggerConfiguration MongoDBCapped(
@@ -156,7 +165,8 @@ namespace Serilog
             string collectionName = MongoDBSink.DefaultCollectionName,
             int batchPostingLimit = MongoDBSink.DefaultBatchPostingLimit,
             TimeSpan? period = null,
-            IFormatProvider formatProvider = null)
+            IFormatProvider formatProvider = null,
+            ITextFormatter mongoDBJsonFormatter = null)
         {
             if (loggerConfiguration == null) throw new ArgumentNullException(nameof(loggerConfiguration));
             if (database == null) throw new ArgumentNullException(nameof(database));
@@ -176,7 +186,8 @@ namespace Serilog
                     period,
                     formatProvider,
                     collectionName,
-                    options),
+                    options,
+                    mongoDBJsonFormatter),
                 restrictedToMinimumLevel);
         }
     }
