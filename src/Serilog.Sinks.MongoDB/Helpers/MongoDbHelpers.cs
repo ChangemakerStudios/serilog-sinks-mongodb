@@ -35,10 +35,8 @@ namespace Serilog.Helpers
         /// <returns></returns>
         internal static bool CollectionExists(this IMongoDatabase database, string collectionName)
         {
-            return
-                database.ListCollections(new ListCollectionsOptions { Filter = new BsonDocument { { "name", collectionName } } })
-                    .ToList()
-                    .Any();
+            var collection = database.GetCollection<BsonDocument>(collectionName);
+            return collection != null;
         }
 
         /// <summary>
