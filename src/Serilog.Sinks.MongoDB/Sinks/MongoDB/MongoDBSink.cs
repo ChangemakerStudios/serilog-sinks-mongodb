@@ -24,6 +24,8 @@ using Serilog.Events;
 using Serilog.Helpers;
 using Serilog.Sinks.PeriodicBatching;
 
+using Serilog.Formatting;
+
 namespace Serilog.Sinks.MongoDB
 {
     /// <summary>
@@ -33,7 +35,7 @@ namespace Serilog.Sinks.MongoDB
     {
         readonly string _collectionName;
         readonly IMongoDatabase _mongoDatabase;
-        readonly MongoDBJsonFormatter _mongoDbJsonFormatter;
+        readonly ITextFormatter _mongoDbJsonFormatter;
 
         /// <summary>
         /// Construct a sink posting to the specified database.
@@ -44,14 +46,16 @@ namespace Serilog.Sinks.MongoDB
         /// <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
         /// <param name="collectionName">Name of the MongoDb collection to use for the log. Default is "log".</param>
         /// <param name="collectionCreationOptions">Collection Creation Options for the log collection creation.</param>
+        /// <param name="mongoDBJsonFormatter">Formatter to produce json for MongoDB.</param>
         public MongoDBSink(
             string databaseUrlOrConnStrName,
             int batchPostingLimit = DefaultBatchPostingLimit,
             TimeSpan? period = null,
             IFormatProvider formatProvider = null,
             string collectionName = DefaultCollectionName,
-            CreateCollectionOptions collectionCreationOptions = null)
-            : this(DatabaseFromMongoUrl(databaseUrlOrConnStrName), batchPostingLimit, period, formatProvider, collectionName, collectionCreationOptions)
+            CreateCollectionOptions collectionCreationOptions = null,
+            ITextFormatter mongoDBJsonFormatter = null)
+            : this(DatabaseFromMongoUrl(databaseUrlOrConnStrName), batchPostingLimit, period, formatProvider, collectionName, collectionCreationOptions, mongoDBJsonFormatter)
         {
         }
 
@@ -64,20 +68,22 @@ namespace Serilog.Sinks.MongoDB
         /// <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
         /// <param name="collectionName">Name of the MongoDb collection to use for the log. Default is "log".</param>
         /// <param name="collectionCreationOptions">Collection Creation Options for the log collection creation.</param>
+        /// <param name="mongoDBJsonFormatter">Formatter to produce json for MongoDB.</param>
         public MongoDBSink(
             IMongoDatabase database,
             int batchPostingLimit = DefaultBatchPostingLimit,
             TimeSpan? period = null,
             IFormatProvider formatProvider = null,
             string collectionName = DefaultCollectionName,
-            CreateCollectionOptions collectionCreationOptions = null)
+            CreateCollectionOptions collectionCreationOptions = null,
+            ITextFormatter mongoDBJsonFormatter = null)
             : base(batchPostingLimit, period ?? DefaultPeriod)
         {
             if (database == null) throw new ArgumentNullException(nameof(database));
 
             this._mongoDatabase = database;
             this._collectionName = collectionName;
-            this._mongoDbJsonFormatter = new MongoDBJsonFormatter(true, renderMessage: true, formatProvider: formatProvider);
+            this._mongoDbJsonFormatter = mongoDBJsonFormatter ?? new MongoDBJsonFormatter(true, renderMessage: true, formatProvider: formatProvider);
 
             this._mongoDatabase.VerifyCollectionExists(this._collectionName, collectionCreationOptions);
         }

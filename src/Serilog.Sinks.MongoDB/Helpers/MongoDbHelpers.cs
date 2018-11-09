@@ -21,7 +21,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 
 using Serilog.Events;
-using Serilog.Formatting.Json;
+using Serilog.Formatting;
 
 namespace Serilog.Helpers
 {
@@ -35,10 +35,8 @@ namespace Serilog.Helpers
         /// <returns></returns>
         internal static bool CollectionExists(this IMongoDatabase database, string collectionName)
         {
-            return
-                database.ListCollections(new ListCollectionsOptions { Filter = new BsonDocument { { "name", collectionName } } })
-                    .ToList()
-                    .Any();
+            var collection = database.GetCollection<BsonDocument>(collectionName);
+            return collection != null;
         }
 
         /// <summary>
@@ -73,7 +71,7 @@ namespace Serilog.Helpers
         /// <returns></returns>
         /// <exception cref="ArgumentNullException">
         /// </exception>
-        internal static IReadOnlyCollection<BsonDocument> GenerateBsonDocuments(this IEnumerable<LogEvent> events, JsonFormatter formatter)
+        internal static IReadOnlyCollection<BsonDocument> GenerateBsonDocuments(this IEnumerable<LogEvent> events, ITextFormatter formatter)
         {
             if (events == null) throw new ArgumentNullException(nameof(events));
 
