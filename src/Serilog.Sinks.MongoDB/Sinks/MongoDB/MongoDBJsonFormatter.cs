@@ -65,6 +65,7 @@ namespace Serilog.Sinks.MongoDB
             ref string precedingDelimiter,
             TextWriter output)
         {
+            name = name.Replace('$', '_').Replace('.', '-');
             Action<object, TextWriter> action;
             if (value != null && _dateTimeWriters.TryGetValue(value.GetType(), out action))
             {
