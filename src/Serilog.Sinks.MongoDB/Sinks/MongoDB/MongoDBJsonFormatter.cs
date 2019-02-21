@@ -14,16 +14,16 @@
 
 using System.Collections.Generic;
 using MongoDB.Bson;
-using Serilog.Formatting.Json;
 using System;
 using System.IO;
+using Serilog.Formatting.Json;
 
 namespace Serilog.Sinks.MongoDB
 {
     /// <summary>
     /// JsonFormatter for MongoDB
     /// </summary>
-    public class MongoDBJsonFormatter : JsonFormatter
+    public class MongoDBJsonFormatter : BaseJsonFormatter
     {
         private readonly IDictionary<Type, Action<object, TextWriter>> _dateTimeWriters;
 
@@ -65,6 +65,7 @@ namespace Serilog.Sinks.MongoDB
             ref string precedingDelimiter,
             TextWriter output)
         {
+            name = name.Replace('$', '_').Replace('.', '-');
             Action<object, TextWriter> action;
             if (value != null && _dateTimeWriters.TryGetValue(value.GetType(), out action))
             {
