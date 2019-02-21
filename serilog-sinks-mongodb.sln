@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{037440DE-440B-4129-9F7A-09B42D00397E}"
 EndProject
@@ -18,9 +18,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "global", "global", "{FDF191
 		src\Serilog.Sinks.MongoDB2\global.json = src\Serilog.Sinks.MongoDB2\global.json
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Serilog.Sinks.MongoDB", "src\Serilog.Sinks.MongoDB\Serilog.Sinks.MongoDB.xproj", "{2605ED8C-C12A-42FB-9825-32FFEA7B4301}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{74E9703C-1242-4EC0-B75B-88BFAA48D438}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serilog.Sinks.MongoDB", "src\Serilog.Sinks.MongoDB\Serilog.Sinks.MongoDB.csproj", "{F4A21F37-6240-4338-BEAC-855ECCE7892D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,15 +28,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2605ED8C-C12A-42FB-9825-32FFEA7B4301}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2605ED8C-C12A-42FB-9825-32FFEA7B4301}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2605ED8C-C12A-42FB-9825-32FFEA7B4301}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2605ED8C-C12A-42FB-9825-32FFEA7B4301}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4A21F37-6240-4338-BEAC-855ECCE7892D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4A21F37-6240-4338-BEAC-855ECCE7892D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4A21F37-6240-4338-BEAC-855ECCE7892D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4A21F37-6240-4338-BEAC-855ECCE7892D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{2605ED8C-C12A-42FB-9825-32FFEA7B4301} = {037440DE-440B-4129-9F7A-09B42D00397E}
+		{F4A21F37-6240-4338-BEAC-855ECCE7892D} = {037440DE-440B-4129-9F7A-09B42D00397E}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {27C12358-BF06-4E7C-A4CE-130A2A9619BD}
 	EndGlobalSection
 EndGlobal
