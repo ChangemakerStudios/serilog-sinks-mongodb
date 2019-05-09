@@ -93,7 +93,19 @@ namespace Serilog.Helpers
 
             payload.Write("]}");
 
-            var bson = BsonDocument.Parse(payload.ToString());
+            var payloadString = payload.ToString();
+            var matches = Regex.Matches(payloadString, "\\\"[\\.$][^\"]*\\\":|\\\"[^\"]*[\\.$]\\\":|\\\"[^\"]*[\\.$][^\"]*\\\":");
+
+            if (matches?.Any() ?? false)
+            {
+                var matchedValues = matches.Select(x => x.Value).Distinct().ToArray();
+                foreach (var match in matchedValues)
+                {
+                    payloadString = payloadString.Replace(match, match.Replace('.', '-').Replace('$', '_'));
+                }
+            }
+
+            var bson = BsonDocument.Parse(payloadString);
 
             return bson["logEvents"].AsBsonArray.Select(x => x.AsBsonDocument).ToList();
         }
