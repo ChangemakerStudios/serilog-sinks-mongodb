@@ -35,8 +35,21 @@ namespace Serilog.Helpers
         /// <returns></returns>
         internal static bool CollectionExists(this IMongoDatabase database, string collectionName)
         {
-            var collection = database.GetCollection<BsonDocument>(collectionName);
-            return collection != null;
+            try
+            {
+                var command = new BsonDocumentCommand<BsonDocument>(new BsonDocument
+                {
+                    {"collstats", "log"}
+                });
+
+                database.RunCommand(command);
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
