@@ -39,7 +39,7 @@ namespace Serilog.Helpers
             {
                 var command = new BsonDocumentCommand<BsonDocument>(new BsonDocument
                 {
-                    {"collstats", "log"}
+                    {"collstats", collectionName}
                 });
 
                 database.RunCommand(command);
