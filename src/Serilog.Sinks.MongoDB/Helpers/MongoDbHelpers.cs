@@ -35,8 +35,9 @@ namespace Serilog.Helpers
         /// <returns></returns>
         internal static bool CollectionExists(this IMongoDatabase database, string collectionName)
         {
-            var collection = database.GetCollection<BsonDocument>(collectionName);
-            return collection != null;
+            var filter = new BsonDocument("name", collectionName);
+            var collectionCursor = database.ListCollections(new ListCollectionsOptions { Filter = filter });
+            return collectionCursor.Any();
         }
 
         /// <summary>
