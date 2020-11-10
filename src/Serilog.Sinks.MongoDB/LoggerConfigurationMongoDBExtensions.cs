@@ -28,14 +28,30 @@ namespace Serilog
     /// </summary>
     public static class LoggerConfigurationMongoDBExtensions
     {
+        /// <summary>
+        ///     Adds a sink that writes log events as documents to a MongoDb database.
+        /// </summary>
+        /// <param name="loggerConfiguration"></param>
+        /// <param name="configureAction"></param>
+        /// <param name="restrictedToMinimumLevel"></param>
+        /// <returns></returns>
         public static LoggerConfiguration MongoDB(
             this LoggerSinkConfiguration loggerConfiguration,
             Action<MongoDBSinkConfiguration> configureAction,
             LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum)
         {
+            if (loggerConfiguration == null)
+                throw new ArgumentNullException(nameof(loggerConfiguration));
+            if (configureAction == null) throw new ArgumentNullException(nameof(configureAction));
 
+            var configuration = new MongoDBSinkConfiguration();
+
+            configureAction(configuration);
+
+            return loggerConfiguration.Sink(
+                new MongoDBSink(configuration),
+                restrictedToMinimumLevel);
         }
-
 
         /// <summary>
         ///     Adds a sink that writes log events as documents to a MongoDb database.
@@ -62,18 +78,22 @@ namespace Serilog
         {
             if (loggerConfiguration == null)
                 throw new ArgumentNullException(nameof(loggerConfiguration));
+
             if (string.IsNullOrWhiteSpace(databaseUrl))
                 throw new ArgumentNullException(nameof(databaseUrl));
+
+            var c = new MongoDBSinkConfiguration();
+
+            c.SetConnectionString(databaseUrl);
+            c.SetBatchPostingLimit(batchPostingLimit);
+            if (period.HasValue) c.SetBatchPeriod(period.Value);
+            c.SetCollectionName(collectionName);
 
             return
                 loggerConfiguration.Sink(
                     new MongoDBSinkLegacy(
-                        databaseUrl,
-                        batchPostingLimit,
-                        period,
+                        c,
                         formatProvider,
-                        collectionName,
-                        null,
                         mongoDBJsonFormatter),
                     restrictedToMinimumLevel);
         }
@@ -105,15 +125,18 @@ namespace Serilog
                 throw new ArgumentNullException(nameof(loggerConfiguration));
             if (database == null) throw new ArgumentNullException(nameof(database));
 
+            var c = new MongoDBSinkConfiguration();
+
+            c.SetMongoDatabase(database);
+            c.SetBatchPostingLimit(batchPostingLimit);
+            if (period.HasValue) c.SetBatchPeriod(period.Value);
+            c.SetCollectionName(collectionName);
+
             return
                 loggerConfiguration.Sink(
                     new MongoDBSinkLegacy(
-                        database,
-                        batchPostingLimit,
-                        period,
+                        c,
                         formatProvider,
-                        collectionName,
-                        null,
                         mongoDBJsonFormatter),
                     restrictedToMinimumLevel);
         }
@@ -153,24 +176,21 @@ namespace Serilog
             if (string.IsNullOrWhiteSpace(databaseUrl))
                 throw new ArgumentNullException(nameof(databaseUrl));
 
-            var options = new CreateCollectionOptions
-                          {
-                              Capped = true,
-                              MaxSize = cappedMaxSizeMb * 1024 * 1024
-                          };
+            var c = new MongoDBSinkConfiguration();
 
-            if (cappedMaxDocuments.HasValue) options.MaxDocuments = cappedMaxDocuments.Value;
+            c.SetConnectionString(databaseUrl);
+            c.SetBatchPostingLimit(batchPostingLimit);
+            if (period.HasValue) c.SetBatchPeriod(period.Value);
+            c.SetCollectionName(collectionName);
+            c.SetCreateCappedCollection(cappedMaxSizeMb, cappedMaxDocuments);
 
-            return loggerConfiguration.Sink(
-                new MongoDBSinkLegacy(
-                    databaseUrl,
-                    batchPostingLimit,
-                    period,
-                    formatProvider,
-                    collectionName,
-                    options,
-                    mongoDBJsonFormatter),
-                restrictedToMinimumLevel);
+            return
+                loggerConfiguration.Sink(
+                    new MongoDBSinkLegacy(
+                        c,
+                        formatProvider,
+                        mongoDBJsonFormatter),
+                    restrictedToMinimumLevel);
         }
 
         /// <summary>
@@ -204,24 +224,21 @@ namespace Serilog
                 throw new ArgumentNullException(nameof(loggerConfiguration));
             if (database == null) throw new ArgumentNullException(nameof(database));
 
-            var options = new CreateCollectionOptions
-                          {
-                              Capped = true,
-                              MaxSize = cappedMaxSizeMb * 1024 * 1024
-                          };
+            var c = new MongoDBSinkConfiguration();
 
-            if (cappedMaxDocuments.HasValue) options.MaxDocuments = cappedMaxDocuments.Value;
+            c.SetMongoDatabase(database);
+            c.SetBatchPostingLimit(batchPostingLimit);
+            if (period.HasValue) c.SetBatchPeriod(period.Value);
+            c.SetCollectionName(collectionName);
+            c.SetCreateCappedCollection(cappedMaxSizeMb, cappedMaxDocuments);
 
-            return loggerConfiguration.Sink(
-                new MongoDBSinkLegacy(
-                    database,
-                    batchPostingLimit,
-                    period,
-                    formatProvider,
-                    collectionName,
-                    options,
-                    mongoDBJsonFormatter),
-                restrictedToMinimumLevel);
+            return
+                loggerConfiguration.Sink(
+                    new MongoDBSinkLegacy(
+                        c,
+                        formatProvider,
+                        mongoDBJsonFormatter),
+                    restrictedToMinimumLevel);
         }
     }
 }

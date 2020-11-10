@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 
 using MongoDB.Driver;
 
@@ -18,6 +17,14 @@ namespace Serilog.Sinks.MongoDB
         public MongoUrl MongoUrl { get; private set; }
 
         public IMongoDatabase MongoDatabase { get; private set; }
+
+        public void Validate()
+        {
+            if (MongoDatabase == null && MongoUrl == null)
+            {
+                throw new ArgumentOutOfRangeException("Invalid Configuration: MongoDatabase or Mongo Connection String must be set");
+            }
+        }
 
         /// <summary>
         ///     Set the periodic batch timeout period. (Default: 2 seconds)
@@ -76,6 +83,11 @@ namespace Serilog.Sinks.MongoDB
         /// <param name="collectionName"></param>
         public void SetCollectionName(string collectionName)
         {
+            if (collectionName == string.Empty)
+            {
+                throw new ArgumentOutOfRangeException(nameof(collectionName), "Must not be string.empty");
+            }
+
             this.CollectionName = collectionName ?? MongoDBSinkDefaults.CollectionName;
         }
 
@@ -100,7 +112,7 @@ namespace Serilog.Sinks.MongoDB
                 throw new ArgumentNullException(nameof(connectionStringName));
 
             var connectionString =
-                ConfigurationManager.ConnectionStrings[connectionStringName];
+                System.Configuration.ConfigurationManager.ConnectionStrings[connectionStringName];
 
             if (connectionString == null)
                 return false;
@@ -121,6 +133,18 @@ namespace Serilog.Sinks.MongoDB
 
             if (!this.TrySetMongoUrlFromConnectionStringNamed(connectionString))
                 this.SetMongoUrl(connectionString);
+        }
+#else
+        /// <summary>
+        ///     Set the Mongo url (connection string)
+        /// </summary>
+        /// <param name="connectionString"></param>
+        public void SetConnectionString(string connectionString)
+        {
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new ArgumentNullException(nameof(connectionString));
+
+            this.SetMongoUrl(connectionString);
         }
 #endif
     }

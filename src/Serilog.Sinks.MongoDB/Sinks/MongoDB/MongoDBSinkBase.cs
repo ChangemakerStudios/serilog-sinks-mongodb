@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Threading.Tasks;
 
 using MongoDB.Driver;
@@ -29,34 +28,11 @@ namespace Serilog.Sinks.MongoDB
     /// </summary>
     public abstract class MongoDBSinkBase : PeriodicBatchingSink
     {
-        private readonly string _collectionName;
+        private readonly MongoDBSinkConfiguration _configuration;
+
+        protected string CollectionName => this._configuration.CollectionName;
 
         private readonly IMongoDatabase _mongoDatabase;
-
-        /// <summary>
-        ///     Construct a sink posting to the specified database.
-        /// </summary>
-        /// <param name="databaseUrlOrConnStrName">The URL of a MongoDB database, or connection string name containing the URL.</param>
-        /// <param name="batchPostingLimit">The maximum number of events to post in a single batch.</param>
-        /// <param name="period">The time to wait between checking for event batches.</param>
-        /// <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
-        /// <param name="collectionName">Name of the MongoDb collection to use for the log. Default is "log".</param>
-        /// <param name="collectionCreationOptions">Collection Creation Options for the log collection creation.</param>
-        /// <param name="mongoDBJsonFormatter">Formatter to produce json for MongoDB.</param>
-        protected MongoDBSinkBase(
-            string databaseUrlOrConnStrName,
-            int batchPostingLimit = MongoDBSinkDefaults.BatchPostingLimit,
-            TimeSpan? period = null,
-            string collectionName = MongoDBSinkDefaults.CollectionName,
-            CreateCollectionOptions collectionCreationOptions = null)
-            : this(
-                DatabaseFromMongoUrl(databaseUrlOrConnStrName),
-                batchPostingLimit,
-                period,
-                collectionName,
-                collectionCreationOptions)
-        {
-        }
 
         /// <summary>
         ///     Construct a sink posting to a specified database.
@@ -68,57 +44,33 @@ namespace Serilog.Sinks.MongoDB
         /// <param name="collectionName">Name of the MongoDb collection to use for the log. Default is "log".</param>
         /// <param name="collectionCreationOptions">Collection Creation Options for the log collection creation.</param>
         /// <param name="mongoDBJsonFormatter">Formatter to produce json for MongoDB.</param>
-        protected MongoDBSinkBase(
-            IMongoDatabase database,
-            int batchPostingLimit = MongoDBSinkDefaults.BatchPostingLimit,
-            TimeSpan? period = null,
-            string collectionName = MongoDBSinkDefaults.CollectionName,
-            CreateCollectionOptions collectionCreationOptions = null)
-            : base(batchPostingLimit, period ?? MongoDBSinkDefaults.BatchPeriod)
+        protected MongoDBSinkBase(MongoDBSinkConfiguration configuration)
+            : base(configuration.BatchPostingLimit, configuration.BatchPeriod)
         {
-            if (database == null) throw new ArgumentNullException(nameof(database));
+            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
-            this._mongoDatabase = database;
-            this._collectionName = collectionName;
-            this._mongoDatabase.VerifyCollectionExists(
-                this._collectionName,
-                collectionCreationOptions);
+            this._configuration = configuration;
+            this._mongoDatabase = TryGetMongoDatabaseFromConfiguration(configuration);
         }
 
-        /// <summary>
-        ///     Get the MongoDatabase for a specified database url
-        /// </summary>
-        /// <param name="databaseUrlOrConnStrName">The URL of a MongoDB database, or connection string name containing the URL.</param>
-        /// <returns>The Mongodatabase</returns>
-        private static IMongoDatabase DatabaseFromMongoUrl(string databaseUrlOrConnStrName)
+        protected static IMongoDatabase TryGetMongoDatabaseFromConfiguration(
+            MongoDBSinkConfiguration configuration)
         {
-            if (string.IsNullOrWhiteSpace(databaseUrlOrConnStrName))
-                throw new ArgumentNullException(nameof(databaseUrlOrConnStrName));
+            configuration.Validate();
 
-            MongoUrl mongoUrl;
-
-#if NET452
-            try
+            if (configuration.MongoDatabase != null)
             {
-                mongoUrl = MongoUrl.Create(databaseUrlOrConnStrName);
+                return configuration.MongoDatabase;
             }
-            catch (MongoConfigurationException)
-            {
-                var connectionString =
-                    ConfigurationManager.ConnectionStrings[databaseUrlOrConnStrName];
-                if (connectionString == null)
-                    throw new KeyNotFoundException(
-                        $"Invalid database url or connection string key: {databaseUrlOrConnStrName}");
 
-                mongoUrl = MongoUrl.Create(connectionString.ConnectionString);
-            }
-#else
-            mongoUrl = MongoUrl.Create(databaseUrlOrConnStrName);
-#endif
+            var mongoDatabase = new MongoClient(configuration.MongoUrl).GetDatabase(
+                configuration.MongoUrl.DatabaseName);
 
-            var mongoClient = new MongoClient(mongoUrl);
+            mongoDatabase.VerifyCollectionExists(
+                configuration.CollectionName,
+                configuration.CollectionCreationOptions);
 
-            return mongoClient.GetDatabase(mongoUrl.DatabaseName);
+            return mongoDatabase;
         }
 
         /// <summary>
@@ -127,7 +79,7 @@ namespace Serilog.Sinks.MongoDB
         /// <returns></returns>
         protected IMongoCollection<T> GetCollection<T>()
         {
-            return this._mongoDatabase.GetCollection<T>(this._collectionName);
+            return this._mongoDatabase.GetCollection<T>(this.CollectionName);
         }
 
         protected Task InsertMany<T>(IEnumerable<T> objects)

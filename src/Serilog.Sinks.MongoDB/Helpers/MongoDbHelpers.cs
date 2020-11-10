@@ -63,41 +63,5 @@ namespace Serilog.Helpers
                 if (!e.ErrorMessage.Equals("collection already exists")) throw;
             }
         }
-
-        
-        internal static IMongoDatabase GetMongoDatabase(this MongoDBSinkConfiguration configuration)
-        {
-            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
-
-            if (configuration.MongoDatabase != null)
-            {
-                return configuration.MongoDatabase;
-            }
-
-            MongoUrl mongoUrl;
-
-#if NET452
-            try
-            {
-                mongoUrl = MongoUrl.Create(databaseUrlOrConnStrName);
-            }
-            catch (MongoConfigurationException)
-            {
-                var connectionString =
-                    ConfigurationManager.ConnectionStrings[databaseUrlOrConnStrName];
-                if (connectionString == null)
-                    throw new KeyNotFoundException(
-                        $"Invalid database url or connection string key: {databaseUrlOrConnStrName}");
-
-                mongoUrl = MongoUrl.Create(connectionString.ConnectionString);
-            }
-#else
-            mongoUrl = MongoUrl.Create(databaseUrlOrConnStrName);
-#endif
-
-            var mongoClient = new MongoClient(mongoUrl);
-
-            return mongoClient.GetDatabase(mongoUrl.DatabaseName);
-        }
     }
 }

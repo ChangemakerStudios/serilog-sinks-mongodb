@@ -31,39 +31,10 @@ namespace Serilog.Sinks.MongoDB
         private readonly ITextFormatter _formatter;
 
         public MongoDBSinkLegacy(
-            string databaseUrlOrConnStrName,
-            int batchPostingLimit = MongoDBSinkDefaults.BatchPostingLimit,
-            TimeSpan? period = null,
+            MongoDBSinkConfiguration configuration,
             IFormatProvider formatProvider = null,
-            string collectionName = MongoDBSinkDefaults.CollectionName,
-            CreateCollectionOptions collectionCreationOptions = null,
             ITextFormatter textFormatter = null)
-            : base(
-                databaseUrlOrConnStrName,
-                batchPostingLimit,
-                period,
-                collectionName,
-                collectionCreationOptions)
-        {
-            this._formatter = textFormatter ?? new MongoDbJsonFormatter(
-                                  renderMessage: true,
-                                  formatProvider: formatProvider);
-        }
-
-        public MongoDBSinkLegacy(
-            IMongoDatabase database,
-            int batchPostingLimit = MongoDBSinkDefaults.BatchPostingLimit,
-            TimeSpan? period = null,
-            IFormatProvider formatProvider = null,
-            string collectionName = MongoDBSinkDefaults.CollectionName,
-            CreateCollectionOptions collectionCreationOptions = null,
-            ITextFormatter textFormatter = null)
-            : base(
-                database,
-                batchPostingLimit,
-                period,
-                collectionName,
-                collectionCreationOptions)
+            : base(configuration)
         {
             this._formatter = textFormatter ?? new MongoDbJsonFormatter(
                                   renderMessage: true,

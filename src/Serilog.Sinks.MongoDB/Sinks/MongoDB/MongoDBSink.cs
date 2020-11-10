@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using MongoDB.Bson.Serialization;
-using MongoDB.Driver;
 
 using Serilog.Events;
 
@@ -22,42 +21,12 @@ namespace Serilog.Sinks.MongoDB
                         cm.MapProperty(s => s.Message);
                         cm.MapProperty(s => s.Source);
                         cm.MapProperty(s => s.StackTrace);
-                        cm.MapProperty(s => s.TargetSite);
                         cm.MapProperty(s => s.Data);
                     });
         }
 
-        public MongoDBSink(
-            string databaseUrlOrConnStrName,
-            int batchPostingLimit = MongoDBSinkDefaults.BatchPostingLimit,
-            TimeSpan? period = null,
-            IFormatProvider formatProvider = null,
-            string collectionName = MongoDBSinkDefaults.CollectionName,
-            CreateCollectionOptions collectionCreationOptions = null)
-            : base(
-                databaseUrlOrConnStrName,
-                batchPostingLimit,
-                period,
-                formatProvider,
-                collectionName,
-                collectionCreationOptions)
-        {
-        }
-
-        public MongoDBSink(
-            IMongoDatabase database,
-            int batchPostingLimit = MongoDBSinkDefaults.BatchPostingLimit,
-            TimeSpan? period = null,
-            IFormatProvider formatProvider = null,
-            string collectionName = MongoDBSinkDefaults.CollectionName,
-            CreateCollectionOptions collectionCreationOptions = null)
-            : base(
-                database,
-                batchPostingLimit,
-                period,
-                formatProvider,
-                collectionName,
-                collectionCreationOptions)
+        public MongoDBSink(MongoDBSinkConfiguration configuration)
+            : base(configuration)
         {
         }
 
