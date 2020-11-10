@@ -13,22 +13,18 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-using Serilog.Events;
-using Serilog.Formatting;
+using Serilog.Sinks.MongoDB;
 
 namespace Serilog.Helpers
 {
     internal static class MongoDbHelper
     {
         /// <summary>
-        /// Returns true if a collection exists on the mongodb server.
+        ///     Returns true if a collection exists on the mongodb server.
         /// </summary>
         /// <param name="database">The database.</param>
         /// <param name="collectionName">Name of the collection.</param>
@@ -36,17 +32,21 @@ namespace Serilog.Helpers
         internal static bool CollectionExists(this IMongoDatabase database, string collectionName)
         {
             var filter = new BsonDocument("name", collectionName);
-            var collectionCursor = database.ListCollections(new ListCollectionsOptions { Filter = filter });
+            var collectionCursor =
+                database.ListCollections(new ListCollectionsOptions { Filter = filter });
             return collectionCursor.Any();
         }
 
         /// <summary>
-        /// Verifies the collection exists. If it doesn't, create it using the Collection Creation Options provided.
+        ///     Verifies the collection exists. If it doesn't, create it using the Collection Creation Options provided.
         /// </summary>
         /// <param name="database">The database.</param>
         /// <param name="collectionName">Name of the collection.</param>
         /// <param name="collectionCreationOptions">The collection creation options.</param>
-        internal static void VerifyCollectionExists(this IMongoDatabase database, string collectionName, CreateCollectionOptions collectionCreationOptions = null)
+        internal static void VerifyCollectionExists(
+            this IMongoDatabase database,
+            string collectionName,
+            CreateCollectionOptions collectionCreationOptions = null)
         {
             if (database == null) throw new ArgumentNullException(nameof(database));
 
@@ -64,39 +64,40 @@ namespace Serilog.Helpers
             }
         }
 
-        /// <summary>
-        /// Generate BSON documents from LogEvents.
-        /// </summary>
-        /// <param name="events">The events.</param>
-        /// <param name="formatter">The formatter.</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException">
-        /// </exception>
-        internal static IReadOnlyCollection<BsonDocument> GenerateBsonDocuments(this IEnumerable<LogEvent> events, ITextFormatter formatter)
+        
+        internal static IMongoDatabase GetMongoDatabase(this MongoDBSinkConfiguration configuration)
         {
-            if (events == null) throw new ArgumentNullException(nameof(events));
+            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
-            if (formatter == null) throw new ArgumentNullException(nameof(formatter));
-
-            var payload = new StringWriter();
-
-            payload.Write(@"{""logEvents"":[");
-
-            var delimStart = "{";
-
-            foreach (var logEvent in events)
+            if (configuration.MongoDatabase != null)
             {
-                payload.Write(delimStart);
-                formatter.Format(logEvent, payload);
-                payload.Write(@",""UtcTimestamp"":""{0:u}""}}", logEvent.Timestamp.ToUniversalTime().DateTime);
-                delimStart = ",{";
+                return configuration.MongoDatabase;
             }
 
-            payload.Write("]}");
+            MongoUrl mongoUrl;
 
-            var bson = BsonDocument.Parse(payload.ToString());
+#if NET452
+            try
+            {
+                mongoUrl = MongoUrl.Create(databaseUrlOrConnStrName);
+            }
+            catch (MongoConfigurationException)
+            {
+                var connectionString =
+                    ConfigurationManager.ConnectionStrings[databaseUrlOrConnStrName];
+                if (connectionString == null)
+                    throw new KeyNotFoundException(
+                        $"Invalid database url or connection string key: {databaseUrlOrConnStrName}");
 
-            return bson["logEvents"].AsBsonArray.Select(x => x.AsBsonDocument).ToList();
+                mongoUrl = MongoUrl.Create(connectionString.ConnectionString);
+            }
+#else
+            mongoUrl = MongoUrl.Create(databaseUrlOrConnStrName);
+#endif
+
+            var mongoClient = new MongoClient(mongoUrl);
+
+            return mongoClient.GetDatabase(mongoUrl.DatabaseName);
         }
     }
 }

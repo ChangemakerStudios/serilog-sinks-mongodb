@@ -13,21 +13,32 @@
 // limitations under the License.
 
 using System;
+
+using MongoDB.Driver;
+
 using Serilog.Configuration;
 using Serilog.Events;
-using Serilog.Sinks.MongoDB;
-using MongoDB.Driver;
 using Serilog.Formatting;
+using Serilog.Sinks.MongoDB;
 
 namespace Serilog
 {
     /// <summary>
-    /// Adds the WriteTo.MongoDB() extension method to <see cref="LoggerConfiguration"/>.
+    ///     Adds the WriteTo.MongoDB() extension method to <see cref="LoggerConfiguration" />.
     /// </summary>
     public static class LoggerConfigurationMongoDBExtensions
     {
+        public static LoggerConfiguration MongoDB(
+            this LoggerSinkConfiguration loggerConfiguration,
+            Action<MongoDBSinkConfiguration> configureAction,
+            LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum)
+        {
+
+        }
+
+
         /// <summary>
-        /// Adds a sink that writes log events as documents to a MongoDb database.
+        ///     Adds a sink that writes log events as documents to a MongoDb database.
         /// </summary>
         /// <param name="loggerConfiguration">The logger configuration.</param>
         /// <param name="databaseUrl">The URL of a created MongoDB collection that log events will be written to.</param>
@@ -39,27 +50,36 @@ namespace Serilog
         /// <param name="mongoDBJsonFormatter">Formatter to produce json for MongoDB.</param>
         /// <returns>Logger configuration, allowing configuration to continue.</returns>
         /// <exception cref="ArgumentNullException">A required parameter is null.</exception>
-        public static LoggerConfiguration MongoDB(
+        public static LoggerConfiguration MongoDBLegacy(
             this LoggerSinkConfiguration loggerConfiguration,
             string databaseUrl,
-            string collectionName = MongoDBSink.DefaultCollectionName,
+            string collectionName = MongoDBSinkDefaults.CollectionName,
             LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum,
-            int batchPostingLimit = MongoDBSink.DefaultBatchPostingLimit,
+            int batchPostingLimit = MongoDBSinkDefaults.BatchPostingLimit,
             TimeSpan? period = null,
             IFormatProvider formatProvider = null,
             ITextFormatter mongoDBJsonFormatter = null)
         {
-            if (loggerConfiguration == null) throw new ArgumentNullException(nameof(loggerConfiguration));
-            if (string.IsNullOrWhiteSpace(databaseUrl)) throw new ArgumentNullException(nameof(databaseUrl));
+            if (loggerConfiguration == null)
+                throw new ArgumentNullException(nameof(loggerConfiguration));
+            if (string.IsNullOrWhiteSpace(databaseUrl))
+                throw new ArgumentNullException(nameof(databaseUrl));
 
             return
                 loggerConfiguration.Sink(
-                    new MongoDBSink(databaseUrl, batchPostingLimit, period, formatProvider, collectionName, null, mongoDBJsonFormatter),
+                    new MongoDBSinkLegacy(
+                        databaseUrl,
+                        batchPostingLimit,
+                        period,
+                        formatProvider,
+                        collectionName,
+                        null,
+                        mongoDBJsonFormatter),
                     restrictedToMinimumLevel);
         }
 
         /// <summary>
-        /// Adds a sink that writes log events as documents to a MongoDb database.
+        ///     Adds a sink that writes log events as documents to a MongoDb database.
         /// </summary>
         /// <param name="loggerConfiguration">The logger configuration.</param>
         /// <param name="database">The MongoDb database where the log collection will live.</param>
@@ -71,30 +91,41 @@ namespace Serilog
         /// <param name="mongoDBJsonFormatter">Formatter to produce json for MongoDB.</param>
         /// <returns>Logger configuration, allowing configuration to continue.</returns>
         /// <exception cref="ArgumentNullException">A required parameter is null.</exception>
-        public static LoggerConfiguration MongoDB(
+        public static LoggerConfiguration MongoDBLegacy(
             this LoggerSinkConfiguration loggerConfiguration,
             IMongoDatabase database,
             LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum,
-            string collectionName = MongoDBSink.DefaultCollectionName,
-            int batchPostingLimit = MongoDBSink.DefaultBatchPostingLimit,
+            string collectionName = MongoDBSinkDefaults.CollectionName,
+            int batchPostingLimit = MongoDBSinkDefaults.BatchPostingLimit,
             TimeSpan? period = null,
             IFormatProvider formatProvider = null,
             ITextFormatter mongoDBJsonFormatter = null)
         {
-            if (loggerConfiguration == null) throw new ArgumentNullException(nameof(loggerConfiguration));
+            if (loggerConfiguration == null)
+                throw new ArgumentNullException(nameof(loggerConfiguration));
             if (database == null) throw new ArgumentNullException(nameof(database));
 
             return
                 loggerConfiguration.Sink(
-                    new MongoDBSink(database, batchPostingLimit, period, formatProvider, collectionName, null, mongoDBJsonFormatter),
+                    new MongoDBSinkLegacy(
+                        database,
+                        batchPostingLimit,
+                        period,
+                        formatProvider,
+                        collectionName,
+                        null,
+                        mongoDBJsonFormatter),
                     restrictedToMinimumLevel);
         }
 
         /// <summary>
-        /// Adds a sink that writes log events as documents to a capped collection in a MongoDb database.
+        ///     Adds a sink that writes log events as documents to a capped collection in a MongoDb database.
         /// </summary>
         /// <param name="loggerConfiguration">The logger configuration.</param>
-        /// <param name="databaseUrl">The URL of a MongoDb database where the log collection will live (used for backwards compatibility).</param>
+        /// <param name="databaseUrl">
+        ///     The URL of a MongoDb database where the log collection will live (used for backwards
+        ///     compatibility).
+        /// </param>
         /// <param name="restrictedToMinimumLevel">The minimum log event level required in order to write an event to the sink.</param>
         /// <param name="cappedMaxSizeMb">Max total size in megabytes of the created capped collection. (Default: 50mb)</param>
         /// <param name="cappedMaxDocuments">Max number of documents of the created capped collection.</param>
@@ -105,32 +136,33 @@ namespace Serilog
         /// <param name="mongoDBJsonFormatter">Formatter to produce json for MongoDB.</param>
         /// <returns>Logger configuration, allowing configuration to continue.</returns>
         /// <exception cref="ArgumentNullException">A required parameter is null.</exception>
-        public static LoggerConfiguration MongoDBCapped(
+        public static LoggerConfiguration MongoDBCappedLegacy(
             this LoggerSinkConfiguration loggerConfiguration,
             string databaseUrl,
             LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum,
             long cappedMaxSizeMb = 50,
             long? cappedMaxDocuments = null,
-            string collectionName = MongoDBSink.DefaultCollectionName,
-            int batchPostingLimit = MongoDBSink.DefaultBatchPostingLimit,
+            string collectionName = MongoDBSinkDefaults.CollectionName,
+            int batchPostingLimit = MongoDBSinkDefaults.BatchPostingLimit,
             TimeSpan? period = null,
             IFormatProvider formatProvider = null,
             ITextFormatter mongoDBJsonFormatter = null)
         {
-
-            if (loggerConfiguration == null) throw new ArgumentNullException(nameof(loggerConfiguration));
-            if (string.IsNullOrWhiteSpace(databaseUrl)) throw new ArgumentNullException(nameof(databaseUrl));
+            if (loggerConfiguration == null)
+                throw new ArgumentNullException(nameof(loggerConfiguration));
+            if (string.IsNullOrWhiteSpace(databaseUrl))
+                throw new ArgumentNullException(nameof(databaseUrl));
 
             var options = new CreateCollectionOptions
-            {
-                Capped = true,
-                MaxSize = cappedMaxSizeMb * 1024 * 1024
-            };
+                          {
+                              Capped = true,
+                              MaxSize = cappedMaxSizeMb * 1024 * 1024
+                          };
 
             if (cappedMaxDocuments.HasValue) options.MaxDocuments = cappedMaxDocuments.Value;
 
             return loggerConfiguration.Sink(
-                new MongoDBSink(
+                new MongoDBSinkLegacy(
                     databaseUrl,
                     batchPostingLimit,
                     period,
@@ -142,7 +174,7 @@ namespace Serilog
         }
 
         /// <summary>
-        /// Adds a sink that writes log events as documents to a capped collection in a MongoDb database.
+        ///     Adds a sink that writes log events as documents to a capped collection in a MongoDb database.
         /// </summary>
         /// <param name="loggerConfiguration">The logger configuration.</param>
         /// <param name="database">The MongoDb database where the log collection will live.</param>
@@ -156,31 +188,32 @@ namespace Serilog
         /// <param name="mongoDBJsonFormatter">Formatter to produce json for MongoDB.</param>
         /// <returns>Logger configuration, allowing configuration to continue.</returns>
         /// <exception cref="ArgumentNullException">A required parameter is null.</exception>
-        public static LoggerConfiguration MongoDBCapped(
+        public static LoggerConfiguration MongoDBCappedLegacy(
             this LoggerSinkConfiguration loggerConfiguration,
             IMongoDatabase database,
             LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum,
             long cappedMaxSizeMb = 50,
             long? cappedMaxDocuments = null,
-            string collectionName = MongoDBSink.DefaultCollectionName,
-            int batchPostingLimit = MongoDBSink.DefaultBatchPostingLimit,
+            string collectionName = MongoDBSinkDefaults.CollectionName,
+            int batchPostingLimit = MongoDBSinkDefaults.BatchPostingLimit,
             TimeSpan? period = null,
             IFormatProvider formatProvider = null,
             ITextFormatter mongoDBJsonFormatter = null)
         {
-            if (loggerConfiguration == null) throw new ArgumentNullException(nameof(loggerConfiguration));
+            if (loggerConfiguration == null)
+                throw new ArgumentNullException(nameof(loggerConfiguration));
             if (database == null) throw new ArgumentNullException(nameof(database));
 
-            var options = new CreateCollectionOptions()
-            {
-                Capped = true,
-                MaxSize = cappedMaxSizeMb * 1024 * 1024
-            };
+            var options = new CreateCollectionOptions
+                          {
+                              Capped = true,
+                              MaxSize = cappedMaxSizeMb * 1024 * 1024
+                          };
 
             if (cappedMaxDocuments.HasValue) options.MaxDocuments = cappedMaxDocuments.Value;
 
             return loggerConfiguration.Sink(
-                new MongoDBSink(
+                new MongoDBSinkLegacy(
                     database,
                     batchPostingLimit,
                     period,

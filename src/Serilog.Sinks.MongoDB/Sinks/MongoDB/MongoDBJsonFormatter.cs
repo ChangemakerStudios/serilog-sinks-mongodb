@@ -12,18 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using MongoDB.Bson;
-using Serilog.Formatting.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
+
+using MongoDB.Bson;
+
+using Serilog.Formatting.Json;
 
 namespace Serilog.Sinks.MongoDB
 {
     /// <summary>
     /// JsonFormatter for MongoDB
     /// </summary>
-    public class MongoDBJsonFormatter : JsonFormatter
+    public class MongoDbJsonFormatter : JsonFormatter
     {
         private readonly IDictionary<Type, Action<object, TextWriter>> _dateTimeWriters;
 
@@ -42,18 +44,18 @@ namespace Serilog.Sinks.MongoDB
         /// <param name="renderMessage">If true, the message will be rendered and written to the output as a
         /// property named RenderedMessage.</param>
         /// <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
-        public MongoDBJsonFormatter(
+        public MongoDbJsonFormatter(
             bool omitEnclosingObject = false,
             string closingDelimiter = null,
             bool renderMessage = false,
             IFormatProvider formatProvider = null)
             : base(omitEnclosingObject, closingDelimiter, renderMessage, formatProvider)
         {
-            _dateTimeWriters = new Dictionary<Type, Action<object, TextWriter>>
-            {
-                {typeof (DateTime), (v, w) => WriteDateTime((DateTime) v, w)},
-                {typeof (DateTimeOffset), (v, w) => WriteOffset((DateTimeOffset) v, w)}
-            };
+            this._dateTimeWriters = new Dictionary<Type, Action<object, TextWriter>>
+                                    {
+                                        {typeof (DateTime), (v, w) => WriteDateTime((DateTime) v, w)},
+                                        {typeof (DateTimeOffset), (v, w) => WriteOffset((DateTimeOffset) v, w)}
+                                    };
         }
 
         /// <summary>
@@ -67,7 +69,7 @@ namespace Serilog.Sinks.MongoDB
         {
             name = name.Replace('$', '_').Replace('.', '-');
             Action<object, TextWriter> action;
-            if (value != null && _dateTimeWriters.TryGetValue(value.GetType(), out action))
+            if (value != null && this._dateTimeWriters.TryGetValue(value.GetType(), out action))
             {
                 output.Write(precedingDelimiter);
                 output.Write("\"");
