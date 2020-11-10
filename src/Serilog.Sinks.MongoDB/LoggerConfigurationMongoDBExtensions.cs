@@ -37,6 +37,36 @@ namespace Serilog
         /// <returns></returns>
         public static LoggerConfiguration MongoDB(
             this LoggerSinkConfiguration loggerConfiguration,
+            string mongoUrl,
+            Action<MongoDBSinkConfiguration> configureAction,
+            LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum)
+        {
+            if (loggerConfiguration == null)
+                throw new ArgumentNullException(nameof(loggerConfiguration));
+            if (configureAction == null) throw new ArgumentNullException(nameof(configureAction));
+
+            var configuration = new MongoDBSinkConfiguration();
+
+            configuration.SetMongoUrl(mongoUrl);
+
+            configureAction(configuration);
+
+            configuration.Validate();
+
+            return loggerConfiguration.Sink(
+                new MongoDBSink(configuration),
+                restrictedToMinimumLevel);
+        }
+
+        /// <summary>
+        ///     Adds a sink that writes log events as documents to a MongoDb database.
+        /// </summary>
+        /// <param name="loggerConfiguration"></param>
+        /// <param name="configureAction"></param>
+        /// <param name="restrictedToMinimumLevel"></param>
+        /// <returns></returns>
+        public static LoggerConfiguration MongoDB(
+            this LoggerSinkConfiguration loggerConfiguration,
             Action<MongoDBSinkConfiguration> configureAction,
             LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum)
         {
@@ -47,6 +77,8 @@ namespace Serilog
             var configuration = new MongoDBSinkConfiguration();
 
             configureAction(configuration);
+
+            configuration.Validate();
 
             return loggerConfiguration.Sink(
                 new MongoDBSink(configuration),
@@ -78,7 +110,6 @@ namespace Serilog
         {
             if (loggerConfiguration == null)
                 throw new ArgumentNullException(nameof(loggerConfiguration));
-
             if (string.IsNullOrWhiteSpace(databaseUrl))
                 throw new ArgumentNullException(nameof(databaseUrl));
 
