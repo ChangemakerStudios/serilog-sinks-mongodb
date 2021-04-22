@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -94,9 +95,24 @@ namespace Serilog.Helpers
 
             payload.Write("]}");
 
-            var bson = BsonDocument.Parse(payload.ToString());
+            var payloadString = payload.ToString();
+
+            var matches = Regex.Matches(payloadString, "\\\"[\\.$][^\"]*\\\":|\\\"[^\"]*[\\.$]\\\":|\\\"[^\"]*[\\.$][^\"]*\\\":").Cast<Match>();
+
+            if (matches.Any())
+            {
+                var matchedValues = matches.Select(x => x.Value).Distinct().ToArray();
+
+                foreach (var match in matchedValues)
+                {
+                    payloadString = payloadString.Replace(match, match.Replace('.', '-').Replace('$', '_'));
+                }
+            }
+
+            var bson = BsonDocument.Parse(payloadString);
 
             return bson["logEvents"].AsBsonArray.Select(x => x.AsBsonDocument).ToList();
+
         }
     }
 }
