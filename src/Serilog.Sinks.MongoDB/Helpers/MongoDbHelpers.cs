@@ -112,7 +112,6 @@ namespace Serilog.Helpers
             var bson = BsonDocument.Parse(payloadString);
 
             return bson["logEvents"].AsBsonArray.Select(x => x.AsBsonDocument).ToList();
-
         }
     }
 }
