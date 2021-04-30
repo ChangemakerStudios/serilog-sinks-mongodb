@@ -22,7 +22,7 @@ namespace Serilog.Sinks.MongoDB
         {
             if (MongoDatabase == null && MongoUrl == null)
             {
-                throw new ArgumentOutOfRangeException("Invalid Configuration: MongoDatabase or Mongo Connection String must be set");
+                throw new ArgumentOutOfRangeException("Invalid Configuration: MongoDatabase or Mongo Connection String must be specified.");
             }
         }
 

@@ -44,8 +44,17 @@ namespace Serilog.Sinks.MongoDB
                        UtcTimeStamp = logEvent.Timestamp.ToUniversalTime().UtcDateTime,
                        Exception = logEvent.Exception,
                        Properties = BsonDocument.Create(
-                           logEvent.Properties.ToDictionary(s => s.Key, s => ToBsonValue(s.Value)))
+                           logEvent.Properties.ToDictionary(
+                               s => SanitizedElementName(s.Key),
+                               s => ToBsonValue(s.Value)))
                    };
+        }
+
+        private static string SanitizedElementName(string name)
+        {
+            if (name == null) return "[NULL]";
+
+            return name.Replace('.', '-').Replace('$', '_');
         }
 
         internal static BsonValue ToBsonValue(LogEventPropertyValue value)
@@ -56,11 +65,15 @@ namespace Serilog.Sinks.MongoDB
 
             if (value is StructureValue sv)
                 return BsonDocument.Create(
-                    sv.Properties.ToDictionary(s => s.Name, s => ToBsonValue(s.Value)));
+                    sv.Properties.ToDictionary(
+                        s => SanitizedElementName(s.Name),
+                        s => ToBsonValue(s.Value)));
 
             if (value is DictionaryValue dv)
                 return BsonDocument.Create(
-                    dv.Elements.ToDictionary(s => s.Key.Value, s => ToBsonValue(s.Value)));
+                    dv.Elements.ToDictionary(
+                        s => SanitizedElementName(s.Key.Value?.ToString()),
+                        s => ToBsonValue(s.Value)));
 
             if (value is SequenceValue sq)
                 return BsonValue.Create(sq.Elements.Select(ToBsonValue).ToArray());
