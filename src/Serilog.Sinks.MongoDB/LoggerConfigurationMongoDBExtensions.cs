@@ -29,13 +29,13 @@ namespace Serilog
     public static class LoggerConfigurationMongoDBExtensions
     {
         /// <summary>
-        ///     Adds a sink that writes log events as documents to a MongoDb database.
+        ///     Adds a sink that writes log events as bson documents to a MongoDb database.
         /// </summary>
         /// <param name="loggerConfiguration"></param>
         /// <param name="configureAction"></param>
         /// <param name="restrictedToMinimumLevel"></param>
         /// <returns></returns>
-        public static LoggerConfiguration MongoDB(
+        public static LoggerConfiguration MongoDbBson(
             this LoggerSinkConfiguration loggerConfiguration,
             string mongoUrl,
             Action<MongoDBSinkConfiguration> configureAction,
@@ -59,13 +59,13 @@ namespace Serilog
         }
 
         /// <summary>
-        ///     Adds a sink that writes log events as documents to a MongoDb database.
+        ///     Adds a sink that writes log events as bson documents to a MongoDb database.
         /// </summary>
         /// <param name="loggerConfiguration"></param>
         /// <param name="configureAction"></param>
         /// <param name="restrictedToMinimumLevel"></param>
         /// <returns></returns>
-        public static LoggerConfiguration MongoDB(
+        public static LoggerConfiguration MongoDbBson(
             this LoggerSinkConfiguration loggerConfiguration,
             Action<MongoDBSinkConfiguration> configureAction,
             LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum)
@@ -98,7 +98,7 @@ namespace Serilog
         /// <param name="mongoDBJsonFormatter">Formatter to produce json for MongoDB.</param>
         /// <returns>Logger configuration, allowing configuration to continue.</returns>
         /// <exception cref="ArgumentNullException">A required parameter is null.</exception>
-        public static LoggerConfiguration MongoDBLegacy(
+        public static LoggerConfiguration MongoDB(
             this LoggerSinkConfiguration loggerConfiguration,
             string databaseUrl,
             string collectionName = MongoDBSinkDefaults.CollectionName,
@@ -142,7 +142,7 @@ namespace Serilog
         /// <param name="mongoDBJsonFormatter">Formatter to produce json for MongoDB.</param>
         /// <returns>Logger configuration, allowing configuration to continue.</returns>
         /// <exception cref="ArgumentNullException">A required parameter is null.</exception>
-        public static LoggerConfiguration MongoDBLegacy(
+        public static LoggerConfiguration MongoDB(
             this LoggerSinkConfiguration loggerConfiguration,
             IMongoDatabase database,
             LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum,
@@ -190,7 +190,7 @@ namespace Serilog
         /// <param name="mongoDBJsonFormatter">Formatter to produce json for MongoDB.</param>
         /// <returns>Logger configuration, allowing configuration to continue.</returns>
         /// <exception cref="ArgumentNullException">A required parameter is null.</exception>
-        public static LoggerConfiguration MongoDBCappedLegacy(
+        public static LoggerConfiguration MongoDBCapped(
             this LoggerSinkConfiguration loggerConfiguration,
             string databaseUrl,
             LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum,
@@ -239,7 +239,7 @@ namespace Serilog
         /// <param name="mongoDBJsonFormatter">Formatter to produce json for MongoDB.</param>
         /// <returns>Logger configuration, allowing configuration to continue.</returns>
         /// <exception cref="ArgumentNullException">A required parameter is null.</exception>
-        public static LoggerConfiguration MongoDBCappedLegacy(
+        public static LoggerConfiguration MongoDBCapped(
             this LoggerSinkConfiguration loggerConfiguration,
             IMongoDatabase database,
             LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum,
