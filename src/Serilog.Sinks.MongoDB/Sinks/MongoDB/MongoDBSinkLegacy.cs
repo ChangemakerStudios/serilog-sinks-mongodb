@@ -23,6 +23,7 @@ using MongoDB.Driver;
 
 using Serilog.Events;
 using Serilog.Formatting;
+using Serilog.Helpers;
 
 namespace Serilog.Sinks.MongoDB
 {
@@ -73,7 +74,8 @@ namespace Serilog.Sinks.MongoDB
 
             var bson = BsonDocument.Parse(payload.ToString());
 
-            return bson["logEvents"].AsBsonArray.Select(x => x.AsBsonDocument).ToList();
+            return bson["logEvents"].AsBsonArray
+                .Select(x => x.AsBsonDocument.SanitizeDocumentRecursive()).ToList();
         }
 
         /// <summary>

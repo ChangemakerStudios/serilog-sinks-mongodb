@@ -68,8 +68,8 @@ namespace Serilog.Sinks.MongoDB
             TextWriter output)
         {
             name = name.Replace('$', '_').Replace('.', '-');
-            Action<object, TextWriter> action;
-            if (value != null && this._dateTimeWriters.TryGetValue(value.GetType(), out action))
+
+            if (value != null && this._dateTimeWriters.TryGetValue(value.GetType(), out var action))
             {
                 output.Write(precedingDelimiter);
                 output.Write("\"");
@@ -79,7 +79,9 @@ namespace Serilog.Sinks.MongoDB
                 precedingDelimiter = ",";
             }
             else
+            {
                 base.WriteJsonProperty(name, value, ref precedingDelimiter, output);
+            }
         }
 
         private static void WriteOffset(DateTimeOffset value, TextWriter output)

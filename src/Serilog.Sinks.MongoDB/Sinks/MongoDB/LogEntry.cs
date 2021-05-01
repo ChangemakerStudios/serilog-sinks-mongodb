@@ -18,6 +18,7 @@ using System.Linq;
 using MongoDB.Bson;
 
 using Serilog.Events;
+using Serilog.Helpers;
 
 namespace Serilog.Sinks.MongoDB
 {
@@ -42,61 +43,12 @@ namespace Serilog.Sinks.MongoDB
                        MessageTemplate = logEvent.MessageTemplate,
                        RenderedMessage = logEvent.RenderMessage(),
                        UtcTimeStamp = logEvent.Timestamp.ToUniversalTime().UtcDateTime,
-                       Exception = logEvent.Exception == null ? null : SanitizeDocumentRecursive(logEvent.Exception.ToBsonDocument()),
+                       Exception = logEvent.Exception?.ToBsonDocument().SanitizeDocumentRecursive(),
                        Properties = BsonDocument.Create(
                            logEvent.Properties.ToDictionary(
-                               s => SanitizedElementName(s.Key),
-                               s => ToBsonValue(s.Value)))
+                               s => s.Key.SanitizedElementName(),
+                               s => s.Value.ToBsonValue()))
                    };
-        }
-
-        /// <summary>
-        /// Credit to @IvaskevychYuriy for this excellent solution:
-        /// https://github.com/serilog/serilog-sinks-mongodb/pull/59#issuecomment-830079904
-        /// </summary>
-        /// <param name="document"></param>
-        /// <returns></returns>
-        private static BsonDocument SanitizeDocumentRecursive(BsonDocument document)
-        {
-            var sanitizedElements = document.Select(
-                e => new BsonElement(
-                    SanitizedElementName(e.Name),
-                    e.Value.IsBsonDocument
-                        ? SanitizeDocumentRecursive(e.Value.AsBsonDocument)
-                        : e.Value));
-
-            return new BsonDocument(sanitizedElements);
-        }
-
-        private static string SanitizedElementName(string name)
-        {
-            if (name == null) return "[NULL]";
-
-            return name.Replace('.', '-').Replace('$', '_');
-        }
-
-        internal static BsonValue ToBsonValue(LogEventPropertyValue value)
-        {
-            if (value == null) return null;
-
-            if (value is ScalarValue scalar) return BsonValue.Create(scalar.Value);
-
-            if (value is StructureValue sv)
-                return BsonDocument.Create(
-                    sv.Properties.ToDictionary(
-                        s => SanitizedElementName(s.Name),
-                        s => ToBsonValue(s.Value)));
-
-            if (value is DictionaryValue dv)
-                return BsonDocument.Create(
-                    dv.Elements.ToDictionary(
-                        s => SanitizedElementName(s.Key.Value?.ToString()),
-                        s => ToBsonValue(s.Value)));
-
-            if (value is SequenceValue sq)
-                return BsonValue.Create(sq.Elements.Select(ToBsonValue).ToArray());
-
-            return null;
         }
     }
 }

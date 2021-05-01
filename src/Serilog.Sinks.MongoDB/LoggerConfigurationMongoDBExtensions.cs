@@ -31,39 +31,10 @@ namespace Serilog
     {
         /// <summary>
         ///     Adds a sink that writes log events as bson documents to a MongoDb database.
-        /// </summary>
-        /// <param name="loggerConfiguration"></param>
-        /// <param name="configureAction"></param>
-        /// <param name="restrictedToMinimumLevel"></param>
-        /// <returns></returns>
-        public static LoggerConfiguration MongoDBBson(
-            this LoggerSinkConfiguration loggerConfiguration,
-            string mongoUrl,
-            Action<MongoDBSinkConfiguration> configureAction = null,
-            LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum)
-        {
-            if (loggerConfiguration == null)
-                throw new ArgumentNullException(nameof(loggerConfiguration));
-
-            var cfg = new MongoDBSinkConfiguration();
-
-            cfg.SetMongoUrl(mongoUrl);
-
-            configureAction?.Invoke(cfg);
-
-            cfg.Validate();
-
-            return loggerConfiguration.Sink(
-                new MongoDBSink(cfg),
-                restrictedToMinimumLevel);
-        }
-
-        /// <summary>
-        ///     Adds a sink that writes log events as bson documents to a MongoDb database.
         ///     For AppSettings Configuration.
         /// </summary>
         /// <param name="loggerConfiguration"></param>
-        /// <param name="mongoUrl"></param>
+        /// <param name="databaseUrl">Mongo Url Connection String</param>
         /// <param name="collectionName"></param>
         /// <param name="restrictedToMinimumLevel"></param>
         /// <param name="batchPostingLimit"></param>
@@ -73,7 +44,7 @@ namespace Serilog
         /// <returns></returns>
         public static LoggerConfiguration MongoDBBson(
             this LoggerSinkConfiguration loggerConfiguration,
-            string mongoUrl,
+            string databaseUrl,
             string collectionName = MongoDBSinkDefaults.CollectionName,
             LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum,
             int batchPostingLimit = MongoDBSinkDefaults.BatchPostingLimit,
@@ -83,7 +54,7 @@ namespace Serilog
         {
             var cfg = new MongoDBSinkConfiguration();
 
-            cfg.SetMongoUrl(mongoUrl);
+            cfg.SetMongoUrl(databaseUrl);
             cfg.SetCollectionName(collectionName);
             cfg.SetBatchPostingLimit(batchPostingLimit);
 
@@ -108,6 +79,7 @@ namespace Serilog
 
         /// <summary>
         ///     Adds a sink that writes log events as bson documents to a MongoDb database.
+        ///     Fluent configuration.
         /// </summary>
         /// <param name="loggerConfiguration"></param>
         /// <param name="configureAction"></param>
