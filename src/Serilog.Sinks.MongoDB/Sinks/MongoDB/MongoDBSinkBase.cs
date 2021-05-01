@@ -37,17 +37,13 @@ namespace Serilog.Sinks.MongoDB
         /// <summary>
         ///     Construct a sink posting to a specified database.
         /// </summary>
-        /// <param name="database">The MongoDB database.</param>
-        /// <param name="batchPostingLimit">The maximum number of events to post in a single batch.</param>
-        /// <param name="period">The time to wait between checking for event batches.</param>
-        /// <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
-        /// <param name="collectionName">Name of the MongoDb collection to use for the log. Default is "log".</param>
-        /// <param name="collectionCreationOptions">Collection Creation Options for the log collection creation.</param>
-        /// <param name="mongoDBJsonFormatter">Formatter to produce json for MongoDB.</param>
         protected MongoDBSinkBase(MongoDBSinkConfiguration configuration)
             : base(configuration.BatchPostingLimit, configuration.BatchPeriod)
         {
-            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+            if (configuration == null)
+            {
+                throw new ArgumentNullException(nameof(configuration));
+            }
 
             this._configuration = configuration;
             this._mongoDatabase = TryGetMongoDatabaseFromConfiguration(configuration);
@@ -63,8 +59,8 @@ namespace Serilog.Sinks.MongoDB
                 return configuration.MongoDatabase;
             }
 
-            var mongoDatabase = new MongoClient(configuration.MongoUrl).GetDatabase(
-                configuration.MongoUrl.DatabaseName);
+            var mongoDatabase = new MongoClient(configuration.MongoUrl)
+                .GetDatabase(configuration.MongoUrl.DatabaseName);
 
             mongoDatabase.VerifyCollectionExists(
                 configuration.CollectionName,

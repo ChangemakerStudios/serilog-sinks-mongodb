@@ -35,10 +35,10 @@ namespace Serilog
         /// <param name="configureAction"></param>
         /// <param name="restrictedToMinimumLevel"></param>
         /// <returns></returns>
-        public static LoggerConfiguration MongoDbBson(
+        public static LoggerConfiguration MongoDBBson(
             this LoggerSinkConfiguration loggerConfiguration,
             string mongoUrl,
-            Action<MongoDBSinkConfiguration> configureAction,
+            Action<MongoDBSinkConfiguration> configureAction = null,
             LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum)
         {
             if (loggerConfiguration == null)
@@ -65,7 +65,7 @@ namespace Serilog
         /// <param name="configureAction"></param>
         /// <param name="restrictedToMinimumLevel"></param>
         /// <returns></returns>
-        public static LoggerConfiguration MongoDbBson(
+        public static LoggerConfiguration MongoDBBson(
             this LoggerSinkConfiguration loggerConfiguration,
             Action<MongoDBSinkConfiguration> configureAction,
             LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum)

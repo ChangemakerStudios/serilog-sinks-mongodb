@@ -22,7 +22,16 @@ namespace Serilog.Sinks.MongoDB
         {
             if (MongoDatabase == null && MongoUrl == null)
             {
-                throw new ArgumentOutOfRangeException("Invalid Configuration: MongoDatabase or Mongo Connection String must be specified.");
+                throw new ArgumentOutOfRangeException(
+                    "MongoDatabase or MongoUrl",
+                    "Invalid Configuration: MongoDatabase or Mongo Connection String must be specified.");
+            }
+
+            if (MongoUrl != null && string.IsNullOrWhiteSpace(MongoUrl.DatabaseName))
+            {
+                throw new ArgumentNullException(
+                    nameof(MongoUrl.DatabaseName),
+                    "Database name is required in the MongoDb connection string. Use: mongodb://mongoDbServer/databaseName");
             }
         }
 
@@ -38,8 +47,8 @@ namespace Serilog.Sinks.MongoDB
         /// <summary>
         ///     Setup capped collections during collection creation
         /// </summary>
-        /// <param name="cappedMaxSizeMb"></param>
-        /// <param name="cappedMaxDocuments"></param>
+        /// <param name="cappedMaxSizeMb">(Optional) Max Size in Mb of the Capped Collection. Default is 50mb.</param>
+        /// <param name="cappedMaxDocuments">(Optional) Max Number of Documents in the Capped Collection. Default is none.</param>
         public void SetCreateCappedCollection(
             long cappedMaxSizeMb = 50,
             long? cappedMaxDocuments = null)
@@ -65,7 +74,7 @@ namespace Serilog.Sinks.MongoDB
         }
 
         /// <summary>
-        ///     Set the mongo url (connection string) -- e.g. mongodb://localhost
+        ///     Set the mongo url (connection string) -- e.g. mongodb://localhost/databaseName
         /// </summary>
         /// <param name="mongoUrl"></param>
         public void SetMongoUrl(string mongoUrl)

@@ -29,9 +29,9 @@ namespace Serilog.Sinks.MongoDB
 
         public string RenderedMessage { get; set; }
 
-        public Exception Exception { get; set; }
-
         public BsonDocument Properties { get; set; }
+
+        public BsonDocument Exception { get; set; }
 
         public static LogEntry MapFrom(LogEvent logEvent)
         {
@@ -42,12 +42,30 @@ namespace Serilog.Sinks.MongoDB
                        MessageTemplate = logEvent.MessageTemplate,
                        RenderedMessage = logEvent.RenderMessage(),
                        UtcTimeStamp = logEvent.Timestamp.ToUniversalTime().UtcDateTime,
-                       Exception = logEvent.Exception,
+                       Exception = logEvent.Exception == null ? null : SanitizeDocumentRecursive(logEvent.Exception.ToBsonDocument()),
                        Properties = BsonDocument.Create(
                            logEvent.Properties.ToDictionary(
                                s => SanitizedElementName(s.Key),
                                s => ToBsonValue(s.Value)))
                    };
+        }
+
+        /// <summary>
+        /// Credit to @IvaskevychYuriy for this excellent solution:
+        /// https://github.com/serilog/serilog-sinks-mongodb/pull/59#issuecomment-830079904
+        /// </summary>
+        /// <param name="document"></param>
+        /// <returns></returns>
+        private static BsonDocument SanitizeDocumentRecursive(BsonDocument document)
+        {
+            var sanitizedElements = document.Select(
+                e => new BsonElement(
+                    SanitizedElementName(e.Name),
+                    e.Value.IsBsonDocument
+                        ? SanitizeDocumentRecursive(e.Value.AsBsonDocument)
+                        : e.Value));
+
+            return new BsonDocument(sanitizedElements);
         }
 
         private static string SanitizedElementName(string name)
