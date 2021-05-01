@@ -43,18 +43,17 @@ namespace Serilog
         {
             if (loggerConfiguration == null)
                 throw new ArgumentNullException(nameof(loggerConfiguration));
-            if (configureAction == null) throw new ArgumentNullException(nameof(configureAction));
 
-            var configuration = new MongoDBSinkConfiguration();
+            var cfg = new MongoDBSinkConfiguration();
 
-            configuration.SetMongoUrl(mongoUrl);
+            cfg.SetMongoUrl(mongoUrl);
 
-            configureAction(configuration);
+            configureAction?.Invoke(cfg);
 
-            configuration.Validate();
+            cfg.Validate();
 
             return loggerConfiguration.Sink(
-                new MongoDBSink(configuration),
+                new MongoDBSink(cfg),
                 restrictedToMinimumLevel);
         }
 
@@ -74,14 +73,14 @@ namespace Serilog
                 throw new ArgumentNullException(nameof(loggerConfiguration));
             if (configureAction == null) throw new ArgumentNullException(nameof(configureAction));
 
-            var configuration = new MongoDBSinkConfiguration();
+            var cfg = new MongoDBSinkConfiguration();
 
-            configureAction(configuration);
+            configureAction(cfg);
 
-            configuration.Validate();
+            cfg.Validate();
 
             return loggerConfiguration.Sink(
-                new MongoDBSink(configuration),
+                new MongoDBSink(cfg),
                 restrictedToMinimumLevel);
         }
 
@@ -113,17 +112,17 @@ namespace Serilog
             if (string.IsNullOrWhiteSpace(databaseUrl))
                 throw new ArgumentNullException(nameof(databaseUrl));
 
-            var c = new MongoDBSinkConfiguration();
+            var cfg = new MongoDBSinkConfiguration();
 
-            c.SetConnectionString(databaseUrl);
-            c.SetBatchPostingLimit(batchPostingLimit);
-            if (period.HasValue) c.SetBatchPeriod(period.Value);
-            c.SetCollectionName(collectionName);
+            cfg.SetConnectionString(databaseUrl);
+            cfg.SetBatchPostingLimit(batchPostingLimit);
+            if (period.HasValue) cfg.SetBatchPeriod(period.Value);
+            cfg.SetCollectionName(collectionName);
 
             return
                 loggerConfiguration.Sink(
                     new MongoDBSinkLegacy(
-                        c,
+                        cfg,
                         formatProvider,
                         mongoDBJsonFormatter),
                     restrictedToMinimumLevel);
@@ -156,17 +155,17 @@ namespace Serilog
                 throw new ArgumentNullException(nameof(loggerConfiguration));
             if (database == null) throw new ArgumentNullException(nameof(database));
 
-            var c = new MongoDBSinkConfiguration();
+            var cfg = new MongoDBSinkConfiguration();
 
-            c.SetMongoDatabase(database);
-            c.SetBatchPostingLimit(batchPostingLimit);
-            if (period.HasValue) c.SetBatchPeriod(period.Value);
-            c.SetCollectionName(collectionName);
+            cfg.SetMongoDatabase(database);
+            cfg.SetBatchPostingLimit(batchPostingLimit);
+            if (period.HasValue) cfg.SetBatchPeriod(period.Value);
+            cfg.SetCollectionName(collectionName);
 
             return
                 loggerConfiguration.Sink(
                     new MongoDBSinkLegacy(
-                        c,
+                        cfg,
                         formatProvider,
                         mongoDBJsonFormatter),
                     restrictedToMinimumLevel);
@@ -207,18 +206,18 @@ namespace Serilog
             if (string.IsNullOrWhiteSpace(databaseUrl))
                 throw new ArgumentNullException(nameof(databaseUrl));
 
-            var c = new MongoDBSinkConfiguration();
+            var cfg = new MongoDBSinkConfiguration();
 
-            c.SetConnectionString(databaseUrl);
-            c.SetBatchPostingLimit(batchPostingLimit);
-            if (period.HasValue) c.SetBatchPeriod(period.Value);
-            c.SetCollectionName(collectionName);
-            c.SetCreateCappedCollection(cappedMaxSizeMb, cappedMaxDocuments);
+            cfg.SetConnectionString(databaseUrl);
+            cfg.SetBatchPostingLimit(batchPostingLimit);
+            if (period.HasValue) cfg.SetBatchPeriod(period.Value);
+            cfg.SetCollectionName(collectionName);
+            cfg.SetCreateCappedCollection(cappedMaxSizeMb, cappedMaxDocuments);
 
             return
                 loggerConfiguration.Sink(
                     new MongoDBSinkLegacy(
-                        c,
+                        cfg,
                         formatProvider,
                         mongoDBJsonFormatter),
                     restrictedToMinimumLevel);
@@ -255,18 +254,18 @@ namespace Serilog
                 throw new ArgumentNullException(nameof(loggerConfiguration));
             if (database == null) throw new ArgumentNullException(nameof(database));
 
-            var c = new MongoDBSinkConfiguration();
+            var cfg = new MongoDBSinkConfiguration();
 
-            c.SetMongoDatabase(database);
-            c.SetBatchPostingLimit(batchPostingLimit);
-            if (period.HasValue) c.SetBatchPeriod(period.Value);
-            c.SetCollectionName(collectionName);
-            c.SetCreateCappedCollection(cappedMaxSizeMb, cappedMaxDocuments);
+            cfg.SetMongoDatabase(database);
+            cfg.SetBatchPostingLimit(batchPostingLimit);
+            if (period.HasValue) cfg.SetBatchPeriod(period.Value);
+            cfg.SetCollectionName(collectionName);
+            cfg.SetCreateCappedCollection(cappedMaxSizeMb, cappedMaxDocuments);
 
             return
                 loggerConfiguration.Sink(
                     new MongoDBSinkLegacy(
-                        c,
+                        cfg,
                         formatProvider,
                         mongoDBJsonFormatter),
                     restrictedToMinimumLevel);

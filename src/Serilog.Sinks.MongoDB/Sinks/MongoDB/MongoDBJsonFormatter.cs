@@ -25,7 +25,7 @@ namespace Serilog.Sinks.MongoDB
     /// <summary>
     /// JsonFormatter for MongoDB
     /// </summary>
-    public class MongoDbJsonFormatter : JsonFormatter
+    public class MongoDBJsonFormatter : JsonFormatter
     {
         private readonly IDictionary<Type, Action<object, TextWriter>> _dateTimeWriters;
 
@@ -44,7 +44,7 @@ namespace Serilog.Sinks.MongoDB
         /// <param name="renderMessage">If true, the message will be rendered and written to the output as a
         /// property named RenderedMessage.</param>
         /// <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
-        public MongoDbJsonFormatter(
+        public MongoDBJsonFormatter(
             bool omitEnclosingObject = false,
             string closingDelimiter = null,
             bool renderMessage = false,

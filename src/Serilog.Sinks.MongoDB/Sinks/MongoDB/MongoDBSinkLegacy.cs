@@ -36,7 +36,7 @@ namespace Serilog.Sinks.MongoDB
             ITextFormatter textFormatter = null)
             : base(configuration)
         {
-            this._formatter = textFormatter ?? new MongoDbJsonFormatter(
+            this._formatter = textFormatter ?? new MongoDBJsonFormatter(
                                   renderMessage: true,
                                   formatProvider: formatProvider);
         }
