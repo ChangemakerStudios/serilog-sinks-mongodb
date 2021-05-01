@@ -64,7 +64,7 @@ namespace Serilog.Sinks.MongoDB
         /// <param name="cappedMaxSizeMb">(Optional) Max Size in Mb of the Capped Collection. Default is 50mb.</param>
         /// <param name="cappedMaxDocuments">(Optional) Max Number of Documents in the Capped Collection. Default is none.</param>
         public void SetCreateCappedCollection(
-            long cappedMaxSizeMb = 50,
+            long cappedMaxSizeMb = MongoDBSinkDefaults.CappedCollectionMaxSizeMb,
             long? cappedMaxDocuments = null)
         {
             this.CollectionCreationOptions = new CreateCollectionOptions

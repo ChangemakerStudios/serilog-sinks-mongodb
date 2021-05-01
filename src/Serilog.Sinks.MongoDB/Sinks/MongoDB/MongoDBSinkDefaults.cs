@@ -30,6 +30,11 @@ namespace Serilog.Sinks.MongoDB
         public const string CollectionName = "log";
 
         /// <summary>
+        ///     Default capped collection max size in megabytes
+        /// </summary>
+        public const int CappedCollectionMaxSizeMb = 50;
+
+        /// <summary>
         ///     A reasonable default time to wait between checking for event batches.
         /// </summary>
         public static readonly TimeSpan BatchPeriod = TimeSpan.FromSeconds(2);

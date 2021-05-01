@@ -21,6 +21,7 @@ using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Sinks.MongoDB;
 
+// ReSharper disable once CheckNamespace
 namespace Serilog
 {
     /// <summary>
@@ -49,6 +50,54 @@ namespace Serilog
             cfg.SetMongoUrl(mongoUrl);
 
             configureAction?.Invoke(cfg);
+
+            cfg.Validate();
+
+            return loggerConfiguration.Sink(
+                new MongoDBSink(cfg),
+                restrictedToMinimumLevel);
+        }
+
+        /// <summary>
+        ///     Adds a sink that writes log events as bson documents to a MongoDb database.
+        ///     For AppSettings Configuration.
+        /// </summary>
+        /// <param name="loggerConfiguration"></param>
+        /// <param name="mongoUrl"></param>
+        /// <param name="collectionName"></param>
+        /// <param name="restrictedToMinimumLevel"></param>
+        /// <param name="batchPostingLimit"></param>
+        /// <param name="period"></param>
+        /// <param name="cappedMaxSizeMb"></param>
+        /// <param name="cappedMaxDocuments"></param>
+        /// <returns></returns>
+        public static LoggerConfiguration MongoDBBson(
+            this LoggerSinkConfiguration loggerConfiguration,
+            string mongoUrl,
+            string collectionName = MongoDBSinkDefaults.CollectionName,
+            LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum,
+            int batchPostingLimit = MongoDBSinkDefaults.BatchPostingLimit,
+            TimeSpan? period = null,
+            long? cappedMaxSizeMb = null,
+            long? cappedMaxDocuments = null)
+        {
+            var cfg = new MongoDBSinkConfiguration();
+
+            cfg.SetMongoUrl(mongoUrl);
+            cfg.SetCollectionName(collectionName);
+            cfg.SetBatchPostingLimit(batchPostingLimit);
+
+            if (period.HasValue)
+            {
+                cfg.SetBatchPeriod(period.Value);
+            }
+
+            if (cappedMaxSizeMb.HasValue || cappedMaxDocuments.HasValue)
+            {
+                cfg.SetCreateCappedCollection(
+                    cappedMaxSizeMb ?? MongoDBSinkDefaults.CappedCollectionMaxSizeMb,
+                    cappedMaxDocuments);
+            }
 
             cfg.Validate();
 
