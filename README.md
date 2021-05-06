@@ -17,6 +17,11 @@ var log = new LoggerConfiguration()
     .WriteTo.MongoDB("mongodb://mymongodb/logs")
     .CreateLogger();
 
+// basic usage defaults to writing to `log` collection
+var log = new LoggerConfiguration()
+    .WriteTo.MongoDB("mongodb://mymongodb/logs")
+    .CreateLogger();
+
 // creates custom collection `applog`
 var log = new LoggerConfiguration()
     .WriteTo.MongoDB("mongodb://mymongodb/logs", collectionName: "applog")
@@ -34,5 +39,27 @@ var log = new LoggerConfiguration()
 // optional parameters cappedMaxSizeMb and cappedMaxDocuments specified
 var log = new LoggerConfiguration()
     .WriteTo.MongoDBCapped("mongodb://mymongodb/logs", cappedMaxSizeMb: 50, cappedMaxDocuments: 1000)
+    .CreateLogger();
+```
+
+New in v5.0, directly seralize log events using MongoDb native Bson:
+
+```csharp
+// use Bson structured logs
+var log = new LoggerConfiguration()
+    .WriteTo.MongoDBBson("mongodb://mymongodb/logs")
+    .CreateLogger();
+
+// capped collection using Bson structured logs
+var log = new LoggerConfiguration()
+    .WriteTo.MongoDBBson("mongodb://mymongodb/logs", cfg =>
+    {
+        // optional configuration options:
+        cfg.SetCollectionName("log");
+        cfg.SetBatchPeriod(TimeSpan.FromSeconds(1));
+
+        // create capped collection that is max 100mb
+        cfg.SetCreateCappedCollection(100mb);
+    })
     .CreateLogger();
 ```

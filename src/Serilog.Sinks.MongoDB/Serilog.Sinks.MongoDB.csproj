@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net4.5;netstandard1.5</TargetFrameworks>
+    <TargetFrameworks>net452;netstandard15</TargetFrameworks>
     <ProjectGuid>2605ed8c-c12a-42fb-9825-32ffea7b4301</ProjectGuid>
     <RootNamespace>Serilog.Sinks.MongoDB</RootNamespace>
   </PropertyGroup>
@@ -19,12 +19,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MongoDB.Driver" Version="2.3.0" />
-    <PackageReference Include="Serilog" Version="2.3.0" />
-    <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="2.1.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.11.3" />
+    <PackageReference Include="Serilog" Version="2.10.0" />
+    <PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
+    <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="2.3.0" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
     <Reference Include="System.Configuration" />
   </ItemGroup>
 </Project>
