@@ -1,4 +1,4 @@
-﻿// Copyright 2014-2016 Serilog Contributors
+﻿// Copyright 2014-2020 Serilog Contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -65,6 +65,7 @@ namespace Serilog.Sinks.MongoDB
             ref string precedingDelimiter,
             TextWriter output)
         {
+            name = name.Replace('$', '_').Replace('.', '-');
             Action<object, TextWriter> action;
             if (value != null && _dateTimeWriters.TryGetValue(value.GetType(), out action))
             {
