@@ -30,21 +30,21 @@ var log = new LoggerConfiguration()
 
 // create sink instance with custom mongodb settings.
 var log = new LoggerConfiguration()
-    .WriteTo.MongoDBBson(cfg =>
+	.WriteTo.MongoDBBson(cfg =>
     {
-	// custom MongoDb configuration
-	var mongoDbSettings = new MongoClientSettings
-	{
-	    UseTls = true,			
-            AllowInsecureTls = true,
-	    Credential = MongoCredential.CreateCredential("databaseName", "username", "password"),
-	    Server = new MongoServerAddress("127.0.0.1")
-	};
+		// custom MongoDb configuration
+		var mongoDbSettings = new MongoClientSettings
+		{
+			UseTls = true,			
+			AllowInsecureTls = true,
+			Credential = MongoCredential.CreateCredential("databaseName", "username", "password"),
+			Server = new MongoServerAddress("127.0.0.1")
+		};
 		
-	var mongoDbInstance = new MongoClient(mongoDbSettings).GetDatabase("serilog");
+		var mongoDbInstance = new MongoClient(mongoDbSettings).GetDatabase("serilog");
 		
-        // sink will use the IMongoDatabase instance provided
-	cfg.SetMongoDatabase(mongoDbInstance);
+		// sink will use the IMongoDatabase instance provided
+		cfg.SetMongoDatabase(mongoDbInstance);
     })
-    .CreateLogger();    
+	.CreateLogger();    
 ```
