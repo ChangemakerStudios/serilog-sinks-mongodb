@@ -62,4 +62,24 @@ var log = new LoggerConfiguration()
         cfg.SetCreateCappedCollection(100mb);
     })
     .CreateLogger();
+
+// create sink instance with custom mongodb settings.
+var log = new LoggerConfiguration()
+    .WriteTo.MongoDBBson(cfg =>
+    {
+		// custom MongoDb configuration
+		var mongoDbSettings = new MongoClientSettings
+		{
+			UseTls = true,			
+            AllowInsecureTls = true,
+			Credential = MongoCredential.CreateCredential("databaseName", "username", "password"),
+			Server = new MongoServerAddress("127.0.0.1")
+		};
+		
+		var mongoDbInstance = new MongoClient(mongoDbSettings).GetDatabase("serilog");
+		
+        // sink will use the IMongoDatabase instance provided
+		cfg.SetMongoDatabase(mongoDbInstance);
+    })
+    .CreateLogger();    
 ```
