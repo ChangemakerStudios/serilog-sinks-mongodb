@@ -55,8 +55,13 @@ Keys and values are not case-sensitive. This is an example of configuring the si
 ```json
 {
   "Serilog": {
-    "Using":  ["Serilog.Sinks.MSSqlServer"],
-    "MinimumLevel": "Debug",
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": {
+        "Microsoft": "Error",
+        "System": "Warning"
+      }
+    },
     "WriteTo": [
       { 
       	"Name": "MongoDB", 
