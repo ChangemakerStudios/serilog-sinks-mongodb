@@ -48,3 +48,31 @@ var log = new LoggerConfiguration()
     })
 	.CreateLogger();    
 ```
+### JSON (_Microsoft.Extensions.Configuration_)
+
+Keys and values are not case-sensitive. This is an example of configuring the sink arguments.
+
+```json
+{
+  "Serilog": {
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": {
+        "Microsoft": "Error",
+        "System": "Warning"
+      }
+    },
+    "WriteTo": [
+      { 
+      	"Name": "MongoDB", 
+        "Args": { 
+            "databaseUrl": "mongodb://username:password@ip:port/dbName?authSource=admin",
+            "collectionName": "logs",
+            "cappedMaxSizeMb": "1024",
+            "cappedMaxDocuments": "50000"
+            }
+       } 
+    ]
+  }
+}
+```
