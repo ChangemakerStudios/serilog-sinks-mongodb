@@ -7,7 +7,13 @@ A Serilog sink that writes events as documents to [MongoDB](http://mongodb.org).
 **Package** - [Serilog.Sinks.MongoDB](http://nuget.org/packages/serilog.sinks.mongodb)
 | **Platforms** - .NET 4.6.2, .NETStandard 1.5
 
-In the examples below, the sink is writing to the database `logs`. The default collection name is `log`, but a custom collection can be supplied with the optional `CollectionName` parameter. The database and collection will be created if they do not exist.
+### New in v5.x
+* Output structured MongoDB Bson logs by switching to the .MongoDBBson() extensions.
+* Existing the .MongoDB() extensions will continue to work converting logs to Json and then to Bson.
+
+### Configuration
+
+In the examples below, the sink is writing to the database `logs` with structured Bson. The default collection name is `log`, but a custom collection can be supplied with the optional `CollectionName` parameter. The database and collection will be created if they do not exist.
 
 ```csharp
 // use Bson structured logs
@@ -50,7 +56,7 @@ var log = new LoggerConfiguration()
 ```
 ### JSON (_Microsoft.Extensions.Configuration_)
 
-Keys and values are not case-sensitive. This is an example of configuring the sink arguments.
+Keys and values are not case-sensitive. This is an example of configuring the MongoDB sink arguments from _Appsettings.json_:
 
 ```json
 {
@@ -64,7 +70,7 @@ Keys and values are not case-sensitive. This is an example of configuring the si
     },
     "WriteTo": [
       { 
-      	"Name": "MongoDB", 
+      	"Name": "MongoDBBson", 
         "Args": { 
             "databaseUrl": "mongodb://username:password@ip:port/dbName?authSource=admin",
             "collectionName": "logs",
