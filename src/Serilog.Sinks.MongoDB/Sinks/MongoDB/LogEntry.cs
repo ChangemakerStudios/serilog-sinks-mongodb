@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 using Serilog.Events;
 using Serilog.Helpers;
@@ -24,6 +25,9 @@ namespace Serilog.Sinks.MongoDB
 {
     public class LogEntry
     {
+        [BsonRepresentation(BsonType.String)]
+        public LogEventLevel Level { get; set; }
+
         public DateTime UtcTimeStamp { get; set; }
 
         public MessageTemplate MessageTemplate { get; set; }
@@ -42,6 +46,7 @@ namespace Serilog.Sinks.MongoDB
                    {
                        MessageTemplate = logEvent.MessageTemplate,
                        RenderedMessage = logEvent.RenderMessage(),
+                       Level = logEvent.Level,
                        UtcTimeStamp = logEvent.Timestamp.ToUniversalTime().UtcDateTime,
                        Exception = logEvent.Exception?.ToBsonDocument().SanitizeDocumentRecursive(),
                        Properties = BsonDocument.Create(
