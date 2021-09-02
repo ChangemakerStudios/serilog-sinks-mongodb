@@ -5,34 +5,80 @@
 A Serilog sink that writes events as documents to [MongoDB](http://mongodb.org).
 
 **Package** - [Serilog.Sinks.MongoDB](http://nuget.org/packages/serilog.sinks.mongodb)
-| **Platforms** - .NET 4.6, .NETStandard 1.5
+| **Platforms** - .NET 4.6.2, .NETStandard 1.5
 
+### New in v5.x
+* Output structured MongoDB Bson logs by switching to the .MongoDBBson() extensions.
+* Existing the .MongoDB() extensions will continue to work converting logs to Json and then to Bson.
 
-In the example shown, the sink will write to the database `logs`. The default collection name is `log`, but a custom collection can be supplied with the optional `CollectionName` parameter.
-The database and collection will be created if they do not exist.
+### Configuration
+
+In the examples below, the sink is writing to the database `logs` with structured Bson. The default collection name is `log`, but a custom collection can be supplied with the optional `CollectionName` parameter. The database and collection will be created if they do not exist.
 
 ```csharp
-// basic usage defaults to writing to `log` collection
+// use Bson structured logs
 var log = new LoggerConfiguration()
-    .WriteTo.MongoDB("mongodb://mymongodb/logs")
+    .WriteTo.MongoDBBson("mongodb://mymongodb/logs")
     .CreateLogger();
 
-// creates custom collection `applog`
+// capped collection using Bson structured logs
 var log = new LoggerConfiguration()
-    .WriteTo.MongoDB("mongodb://mymongodb/logs", collectionName: "applog")
+    .WriteTo.MongoDBBson("mongodb://mymongodb/logs", cfg =>
+    {
+        // optional configuration options:
+        cfg.SetCollectionName("log");
+        cfg.SetBatchPeriod(TimeSpan.FromSeconds(1));
+
+        // create capped collection that is max 100mb
+        cfg.SetCreateCappedCollection(100mb);
+    })
     .CreateLogger();
+
+// create sink instance with custom mongodb settings.
+var log = new LoggerConfiguration()
+	.WriteTo.MongoDBBson(cfg =>
+    {
+		// custom MongoDb configuration
+		var mongoDbSettings = new MongoClientSettings
+		{
+			UseTls = true,			
+			AllowInsecureTls = true,
+			Credential = MongoCredential.CreateCredential("databaseName", "username", "password"),
+			Server = new MongoServerAddress("127.0.0.1")
+		};
+		
+		var mongoDbInstance = new MongoClient(mongoDbSettings).GetDatabase("serilog");
+		
+		// sink will use the IMongoDatabase instance provided
+		cfg.SetMongoDatabase(mongoDbInstance);
+    })
+	.CreateLogger();    
 ```
+### JSON (_Microsoft.Extensions.Configuration_)
 
-Additionally, you can utilize a [Capped Collection](https://docs.mongodb.org/manual/core/capped-collections/).
+Keys and values are not case-sensitive. This is an example of configuring the MongoDB sink arguments from _Appsettings.json_:
 
-```csharp
-// basic with custom collection name
-var log = new LoggerConfiguration()
-    .WriteTo.MongoDBCapped("mongodb://mymongodb/logs", collectionName: "rollingapplog")
-    .CreateLogger();
-
-// optional parameters cappedMaxSizeMb and cappedMaxDocuments specified
-var log = new LoggerConfiguration()
-    .WriteTo.MongoDBCapped("mongodb://mymongodb/logs", cappedMaxSizeMb: 50, cappedMaxDocuments: 1000)
-    .CreateLogger();
+```json
+{
+  "Serilog": {
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": {
+        "Microsoft": "Error",
+        "System": "Warning"
+      }
+    },
+    "WriteTo": [
+      { 
+      	"Name": "MongoDBBson", 
+        "Args": { 
+            "databaseUrl": "mongodb://username:password@ip:port/dbName?authSource=admin",
+            "collectionName": "logs",
+            "cappedMaxSizeMb": "1024",
+            "cappedMaxDocuments": "50000"
+            }
+       } 
+    ]
+  }
+}
 ```

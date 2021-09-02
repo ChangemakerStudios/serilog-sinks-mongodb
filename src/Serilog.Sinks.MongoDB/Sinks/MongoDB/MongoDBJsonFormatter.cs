@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using MongoDB.Bson;
-using Serilog.Formatting.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
+
+using MongoDB.Bson;
+
+using Serilog.Formatting.Json;
 
 namespace Serilog.Sinks.MongoDB
 {
@@ -49,11 +51,11 @@ namespace Serilog.Sinks.MongoDB
             IFormatProvider formatProvider = null)
             : base(omitEnclosingObject, closingDelimiter, renderMessage, formatProvider)
         {
-            _dateTimeWriters = new Dictionary<Type, Action<object, TextWriter>>
-            {
-                {typeof (DateTime), (v, w) => WriteDateTime((DateTime) v, w)},
-                {typeof (DateTimeOffset), (v, w) => WriteOffset((DateTimeOffset) v, w)}
-            };
+            this._dateTimeWriters = new Dictionary<Type, Action<object, TextWriter>>
+                                    {
+                                        {typeof (DateTime), (v, w) => WriteDateTime((DateTime) v, w)},
+                                        {typeof (DateTimeOffset), (v, w) => WriteOffset((DateTimeOffset) v, w)}
+                                    };
         }
 
         /// <summary>
@@ -66,8 +68,8 @@ namespace Serilog.Sinks.MongoDB
             TextWriter output)
         {
             name = name.Replace('$', '_').Replace('.', '-');
-            Action<object, TextWriter> action;
-            if (value != null && _dateTimeWriters.TryGetValue(value.GetType(), out action))
+
+            if (value != null && this._dateTimeWriters.TryGetValue(value.GetType(), out var action))
             {
                 output.Write(precedingDelimiter);
                 output.Write("\"");
@@ -77,7 +79,9 @@ namespace Serilog.Sinks.MongoDB
                 precedingDelimiter = ",";
             }
             else
+            {
                 base.WriteJsonProperty(name, value, ref precedingDelimiter, output);
+            }
         }
 
         private static void WriteOffset(DateTimeOffset value, TextWriter output)
