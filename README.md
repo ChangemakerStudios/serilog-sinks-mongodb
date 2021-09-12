@@ -30,7 +30,7 @@ var log = new LoggerConfiguration()
         cfg.SetBatchPeriod(TimeSpan.FromSeconds(1));
 
         // create capped collection that is max 100mb
-        cfg.SetCreateCappedCollection(100mb);
+        cfg.SetCreateCappedCollection(100);
     })
     .CreateLogger();
 
