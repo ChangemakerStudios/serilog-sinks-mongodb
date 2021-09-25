@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <VersionPrefix>5.1.0</VersionPrefix>
+    <VersionPrefix>5.1.1</VersionPrefix>
     <Authors>Kiran Makkapati, Serilog Contributors</Authors>
     <Copyright>Copyright © Serilog Contributors 2014-2020</Copyright>
     <Description>The MongoDB sink for Serilog</Description>
