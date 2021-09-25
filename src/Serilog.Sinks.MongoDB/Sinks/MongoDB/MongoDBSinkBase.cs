@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 using MongoDB.Driver;
@@ -32,7 +33,7 @@ namespace Serilog.Sinks.MongoDB
 
         protected string CollectionName => this._configuration.CollectionName;
 
-        private readonly IMongoDatabase _mongoDatabase;
+        private readonly Lazy<IMongoDatabase> _mongoDatabase;
 
         /// <summary>
         ///     Construct a sink posting to a specified database.
@@ -46,22 +47,29 @@ namespace Serilog.Sinks.MongoDB
             }
 
             this._configuration = configuration;
-            this._mongoDatabase = TryGetMongoDatabaseFromConfiguration(configuration);
-        }
 
-        protected static IMongoDatabase TryGetMongoDatabaseFromConfiguration(
-            MongoDBSinkConfiguration configuration)
-        {
+            // validate the settings
             configuration.Validate();
 
+            this._mongoDatabase = new Lazy<IMongoDatabase>(
+                () => GetVerifiedMongoDatabaseFromConfiguration(this._configuration),
+                LazyThreadSafetyMode.ExecutionAndPublication);
+        }
+
+        protected static IMongoDatabase GetVerifiedMongoDatabaseFromConfiguration(
+            MongoDBSinkConfiguration configuration)
+        {
             if (configuration.MongoDatabase != null)
             {
+                // don't bother checking
                 return configuration.MongoDatabase;
             }
 
-            var mongoDatabase = new MongoClient(configuration.MongoUrl)
-                .GetDatabase(configuration.MongoUrl.DatabaseName);
+            // verify collection and connection
+            var mongoClient = new MongoClient(configuration.MongoUrl);
+            var mongoDatabase = mongoClient.GetDatabase(configuration.MongoUrl.DatabaseName);
 
+            // connection attempt
             mongoDatabase.VerifyCollectionExists(
                 configuration.CollectionName,
                 configuration.CollectionCreationOptions);
@@ -75,7 +83,7 @@ namespace Serilog.Sinks.MongoDB
         /// <returns></returns>
         protected IMongoCollection<T> GetCollection<T>()
         {
-            return this._mongoDatabase.GetCollection<T>(this.CollectionName);
+            return this._mongoDatabase.Value.GetCollection<T>(this.CollectionName);
         }
 
         protected Task InsertMany<T>(IEnumerable<T> objects)

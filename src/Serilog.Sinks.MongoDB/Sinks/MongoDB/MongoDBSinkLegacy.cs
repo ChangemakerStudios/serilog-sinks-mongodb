@@ -19,7 +19,6 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using MongoDB.Bson;
-using MongoDB.Driver;
 
 using Serilog.Events;
 using Serilog.Formatting;
@@ -38,8 +37,41 @@ namespace Serilog.Sinks.MongoDB
             : base(configuration)
         {
             this._formatter = textFormatter ?? new MongoDBJsonFormatter(
-                                  renderMessage: true,
-                                  formatProvider: formatProvider);
+                renderMessage: true,
+                formatProvider: formatProvider);
+        }
+
+        /// <summary>
+        /// Creates Json from the log events enumerable
+        /// </summary>
+        /// <param name="events"></param>
+        /// <returns></returns>
+        private string GenerateJson(IEnumerable<LogEvent> events)
+        {
+            var logEventLines = new List<string>();
+
+            foreach (var logEvent in events)
+            {
+                string logEventLine;
+
+                using (var writer = new StringWriter())
+                {
+                    this._formatter.Format(logEvent, writer);
+                    logEventLine = writer.ToString().Trim();
+                }
+
+                if (logEventLine.EndsWith("}"))
+                {
+                    // remove so we can add Utc to end
+                    logEventLine = logEventLine.Substring(0, logEventLine.Length - 1);
+                }
+
+                logEventLine += $@", ""UtcTimestamp"": ""{logEvent.Timestamp.ToUniversalTime().DateTime:u}"" }}";
+
+                logEventLines.Add(logEventLine);
+            }
+
+            return $@"{{ ""logEvents"": [{string.Join(",", logEventLines)}] }}";
         }
 
         /// <summary>
@@ -54,25 +86,8 @@ namespace Serilog.Sinks.MongoDB
         {
             if (events == null) throw new ArgumentNullException(nameof(events));
 
-            var payload = new StringWriter();
-
-            payload.Write(@"{""logEvents"":[");
-
-            var delimStart = "{";
-
-            foreach (var logEvent in events)
-            {
-                payload.Write(delimStart);
-                this._formatter.Format(logEvent, payload);
-                payload.Write(
-                    @",""UtcTimestamp"":""{0:u}""}}",
-                    logEvent.Timestamp.ToUniversalTime().DateTime);
-                delimStart = ",{";
-            }
-
-            payload.Write("]}");
-
-            var bson = BsonDocument.Parse(payload.ToString());
+            var json = this.GenerateJson(events);
+            var bson = BsonDocument.Parse(json);
 
             return bson["logEvents"].AsBsonArray
                 .Select(x => x.AsBsonDocument.SanitizeDocumentRecursive()).ToList();
