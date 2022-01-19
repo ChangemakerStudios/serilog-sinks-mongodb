@@ -59,15 +59,9 @@ namespace Serilog.Sinks.MongoDB
         protected static IMongoDatabase GetVerifiedMongoDatabaseFromConfiguration(
             MongoDBSinkConfiguration configuration)
         {
-            if (configuration.MongoDatabase != null)
-            {
-                // don't bother checking
-                return configuration.MongoDatabase;
-            }
-
-            // verify collection and connection
-            var mongoClient = new MongoClient(configuration.MongoUrl);
-            var mongoDatabase = mongoClient.GetDatabase(configuration.MongoUrl.DatabaseName);
+            var mongoDatabase = configuration.MongoDatabase
+                                ?? new MongoClient(configuration.MongoUrl).GetDatabase(
+                                    configuration.MongoUrl.DatabaseName);
 
             // connection attempt
             mongoDatabase.VerifyCollectionExists(

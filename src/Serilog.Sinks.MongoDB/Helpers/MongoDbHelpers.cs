@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics;
 
 using MongoDB.Bson;
 using MongoDB.Driver;
