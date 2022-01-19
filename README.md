@@ -12,7 +12,6 @@ A Serilog sink that writes events as documents to [MongoDB](http://mongodb.org).
 * Existing the .MongoDB() extensions will continue to work converting logs to Json and then to Bson.
 
 ### Configuration
-
 In the examples below, the sink is writing to the database `logs` with structured Bson. The default collection name is `log`, but a custom collection can be supplied with the optional `CollectionName` parameter. The database and collection will be created if they do not exist.
 
 ```csharp
@@ -46,13 +45,13 @@ var log = new LoggerConfiguration()
 			Credential = MongoCredential.CreateCredential("databaseName", "username", "password"),
 			Server = new MongoServerAddress("127.0.0.1")
 		};
-		
+
 		var mongoDbInstance = new MongoClient(mongoDbSettings).GetDatabase("serilog");
 		
 		// sink will use the IMongoDatabase instance provided
 		cfg.SetMongoDatabase(mongoDbInstance);
     })
-	.CreateLogger();    
+	.CreateLogger();
 ```
 ### JSON (_Microsoft.Extensions.Configuration_)
 
@@ -76,8 +75,8 @@ Keys and values are not case-sensitive. This is an example of configuring the Mo
             "collectionName": "logs",
             "cappedMaxSizeMb": "1024",
             "cappedMaxDocuments": "50000"
-            }
-       } 
+        }
+      } 
     ]
   }
 }
