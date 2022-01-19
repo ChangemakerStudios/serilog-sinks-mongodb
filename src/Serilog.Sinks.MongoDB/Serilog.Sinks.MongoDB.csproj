@@ -13,7 +13,7 @@
     <PackageIconUrl>http://serilog.net/images/serilog-sink-nuget.png</PackageIconUrl>
     <PackageId>Serilog.Sinks.MongoDB</PackageId>
     <PackageProjectUrl>http://serilog.net</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/CaptiveAire/Seq.App.YouTrack</RepositoryUrl>
+    <RepositoryUrl>https://github.com/serilog/serilog-sinks-mongodb</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>serilog, mongodb</PackageTags>    
   </PropertyGroup>
