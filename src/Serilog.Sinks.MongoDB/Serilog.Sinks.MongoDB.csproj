@@ -6,16 +6,16 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <VersionPrefix>5.1.1</VersionPrefix>
+    <VersionPrefix>5.1.2</VersionPrefix>
     <Authors>Kiran Makkapati, Serilog Contributors</Authors>
-    <Copyright>Copyright © Serilog Contributors 2014-2020</Copyright>
+    <Copyright>Copyright © Serilog Contributors 2014-2022</Copyright>
     <Description>The MongoDB sink for Serilog</Description>
     <PackageIconUrl>http://serilog.net/images/serilog-sink-nuget.png</PackageIconUrl>
     <PackageId>Serilog.Sinks.MongoDB</PackageId>
     <PackageProjectUrl>http://serilog.net</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/CaptiveAire/Seq.App.YouTrack</RepositoryUrl>
+    <RepositoryUrl>https://github.com/serilog/serilog-sinks-mongodb</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>serilog, mongodb</PackageTags>    
+    <PackageTags>serilog, mongodb</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
