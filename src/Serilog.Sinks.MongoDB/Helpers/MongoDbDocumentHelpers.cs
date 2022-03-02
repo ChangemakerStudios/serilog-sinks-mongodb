@@ -24,7 +24,7 @@ namespace Serilog.Helpers
     {
         /// <summary>
         ///     Credit to @IvaskevychYuriy for this excellent solution:
-        ///     https://github.com/serilog/serilog-sinks-mongodb/pull/59#issuecomment-830079904
+        ///     https://github.com/ChangemakerStudios/serilog-sinks-mongodb/pull/59#issuecomment-830079904
         /// </summary>
         /// <param name="document"></param>
         /// <returns></returns>
