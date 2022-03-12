@@ -59,9 +59,9 @@ namespace Serilog.Helpers
             {
                 database.CreateCollection(collectionName, collectionCreationOptions);
             }
-            catch (MongoCommandException e)
+            catch (MongoCommandException e) when (e.ErrorMessage.Contains("collection already exists"))
             {
-                if (!e.ErrorMessage.Equals("collection already exists")) throw;
+                // handled
             }
         }
 
@@ -88,14 +88,15 @@ namespace Serilog.Helpers
 
                     return;
                 }
-                catch (MongoCommandException)
+                catch (MongoCommandException ex) when (ex.ErrorMessage.Contains("already exists with different options"))
                 {
+                    // handled -- just drop and recreate
+                    logCollection.Indexes.DropOne(ExpireTTLIndexName);
                 }
 
                 try
                 {
                     // delete the index and re-create since it exists with different expiration value
-                    logCollection.Indexes.DropOne(ExpireTTLIndexName);
                     logCollection.Indexes.CreateOne(indexModel);
                 }
                 catch (MongoCommandException ex)
