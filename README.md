@@ -10,6 +10,7 @@ A Serilog sink that writes events as documents to [MongoDB](http://mongodb.org).
 ### New in v5.x
 * Output structured MongoDB Bson logs by switching to the .MongoDBBson() extensions.
 * Existing the .MongoDB() extensions will continue to work converting logs to Json and then to Bson.
+* Expire TTL support for (v5.1.3 -- MongoDbBson sink only)
 
 ### Configuration
 In the examples below, the sink is writing to the database `logs` with structured Bson. The default collection name is `log`, but a custom collection can be supplied with the optional `CollectionName` parameter. The database and collection will be created if they do not exist.
