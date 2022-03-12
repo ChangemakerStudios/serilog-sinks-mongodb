@@ -6,22 +6,6 @@ configuration: Release
 build_script:
 - ps: ./Build.ps1
 
-# install:
-#   - choco install gitversion.portable -pre -y
-
-# assembly_info:
-#   patch: false
-
-# before_build:
-#   - nuget restore
-#   - ps: gitversion /l console /output buildserver /updateAssemblyInfo
-
-# build:
-#   project: serilog-sinks-mongodb.sln  
-
-# after_build:
-#   - cmd: dotnet pack Release -o ..\..\artifacts --version-suffix=%GitVersion_NuGetVersion%
-
 test: false
 artifacts:
 - path: artifacts/Serilog.*.nupkg

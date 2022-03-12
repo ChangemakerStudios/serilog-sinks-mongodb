@@ -68,6 +68,9 @@ namespace Serilog.Sinks.MongoDB
                 configuration.CollectionName,
                 configuration.CollectionCreationOptions);
 
+            // setup TTL if desired
+            mongoDatabase.VerifyExpireTTLSetup(configuration.CollectionName, configuration.ExpireTTL);
+
             return mongoDatabase;
         }
 
@@ -75,7 +78,7 @@ namespace Serilog.Sinks.MongoDB
         ///     Gets the log collection.
         /// </summary>
         /// <returns></returns>
-        protected IMongoCollection<T> GetCollection<T>()
+        public IMongoCollection<T> GetCollection<T>()
         {
             return this._mongoDatabase.Value.GetCollection<T>(this.CollectionName);
         }
