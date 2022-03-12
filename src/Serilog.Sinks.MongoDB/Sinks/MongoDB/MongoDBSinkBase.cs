@@ -31,8 +31,6 @@ namespace Serilog.Sinks.MongoDB
     {
         private readonly MongoDBSinkConfiguration _configuration;
 
-        protected string CollectionName => this._configuration.CollectionName;
-
         private readonly Lazy<IMongoDatabase> _mongoDatabase;
 
         /// <summary>
@@ -41,10 +39,7 @@ namespace Serilog.Sinks.MongoDB
         protected MongoDBSinkBase(MongoDBSinkConfiguration configuration)
             : base(configuration.BatchPostingLimit, configuration.BatchPeriod)
         {
-            if (configuration == null)
-            {
-                throw new ArgumentNullException(nameof(configuration));
-            }
+            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
             this._configuration = configuration;
 
@@ -55,6 +50,8 @@ namespace Serilog.Sinks.MongoDB
                 () => GetVerifiedMongoDatabaseFromConfiguration(this._configuration),
                 LazyThreadSafetyMode.ExecutionAndPublication);
         }
+
+        protected string CollectionName => this._configuration.CollectionName;
 
         protected static IMongoDatabase GetVerifiedMongoDatabaseFromConfiguration(
             MongoDBSinkConfiguration configuration)
@@ -69,7 +66,9 @@ namespace Serilog.Sinks.MongoDB
                 configuration.CollectionCreationOptions);
 
             // setup TTL if desired
-            mongoDatabase.VerifyExpireTTLSetup(configuration.CollectionName, configuration.ExpireTTL);
+            mongoDatabase.VerifyExpireTTLSetup(
+                configuration.CollectionName,
+                configuration.ExpireTTL);
 
             return mongoDatabase;
         }
