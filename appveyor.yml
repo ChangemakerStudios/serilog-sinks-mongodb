@@ -3,21 +3,24 @@ skip_tags: true
 image: Visual Studio 2022
 configuration: Release
 
-install:
-  - choco install gitversion.portable -pre -y
+build_script:
+- ps: ./Build.ps1
 
-assembly_info:
-  patch: false
+# install:
+#   - choco install gitversion.portable -pre -y
 
-before_build:
-  - nuget restore
-  - ps: gitversion /l console /output buildserver /updateAssemblyInfo
+# assembly_info:
+#   patch: false
 
-build:
-  project: serilog-sinks-mongodb.sln  
+# before_build:
+#   - nuget restore
+#   - ps: gitversion /l console /output buildserver /updateAssemblyInfo
 
-after_build:
-  - cmd: dotnet pack Release -o ..\..\artifacts --version-suffix=%GitVersion_NuGetVersion%
+# build:
+#   project: serilog-sinks-mongodb.sln  
+
+# after_build:
+#   - cmd: dotnet pack Release -o ..\..\artifacts --version-suffix=%GitVersion_NuGetVersion%
 
 test: false
 artifacts:
