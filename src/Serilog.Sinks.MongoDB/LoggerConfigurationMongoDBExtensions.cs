@@ -133,7 +133,7 @@ namespace Serilog
             if (string.IsNullOrWhiteSpace(databaseUrl))
                 throw new ArgumentNullException(nameof(databaseUrl));
 
-            var cfg = new MongoDBSinkConfiguration();
+            var cfg = new MongoDBSinkConfiguration() { Legacy = true };
 
             cfg.SetConnectionString(databaseUrl);
             cfg.SetBatchPostingLimit(batchPostingLimit);
@@ -176,7 +176,7 @@ namespace Serilog
                 throw new ArgumentNullException(nameof(loggerConfiguration));
             if (database == null) throw new ArgumentNullException(nameof(database));
 
-            var cfg = new MongoDBSinkConfiguration();
+            var cfg = new MongoDBSinkConfiguration() { Legacy = true };
 
             cfg.SetMongoDatabase(database);
             cfg.SetBatchPostingLimit(batchPostingLimit);
@@ -227,7 +227,7 @@ namespace Serilog
             if (string.IsNullOrWhiteSpace(databaseUrl))
                 throw new ArgumentNullException(nameof(databaseUrl));
 
-            var cfg = new MongoDBSinkConfiguration();
+            var cfg = new MongoDBSinkConfiguration() { Legacy = true };
 
             cfg.SetConnectionString(databaseUrl);
             cfg.SetBatchPostingLimit(batchPostingLimit);
@@ -275,7 +275,7 @@ namespace Serilog
                 throw new ArgumentNullException(nameof(loggerConfiguration));
             if (database == null) throw new ArgumentNullException(nameof(database));
 
-            var cfg = new MongoDBSinkConfiguration();
+            var cfg = new MongoDBSinkConfiguration() { Legacy = true };
 
             cfg.SetMongoDatabase(database);
             cfg.SetBatchPostingLimit(batchPostingLimit);

@@ -26,11 +26,15 @@ namespace Serilog.Sinks.MongoDB
 
         public CreateCollectionOptions CollectionCreationOptions { get; private set; }
 
+        public TimeSpan? ExpireTTL { get; private set; }
+
         public TimeSpan BatchPeriod { get; private set; } = MongoDBSinkDefaults.BatchPeriod;
 
         public MongoUrl MongoUrl { get; private set; }
 
         public IMongoDatabase MongoDatabase { get; private set; }
+
+        public bool Legacy { get; internal set; }
 
         public void Validate()
         {
@@ -47,6 +51,13 @@ namespace Serilog.Sinks.MongoDB
                     nameof(MongoUrl.DatabaseName),
                     "Database name is required in the MongoDb connection string. Use: mongodb://mongoDbServer/databaseName");
             }
+
+            if (ExpireTTL.HasValue && Legacy)
+            {
+                throw new ArgumentNullException(
+                    nameof(ExpireTTL),
+                    "Expiration TTL is only supported on the MongoDBBson Sink");
+            }
         }
 
         /// <summary>
@@ -59,6 +70,16 @@ namespace Serilog.Sinks.MongoDB
         }
 
         /// <summary>
+        /// Sets the expiration time on all log documents: https://docs.mongodb.com/manual/tutorial/expire-data/
+        /// Only supported for the MongoDBBson sink.
+        /// </summary>
+        /// <param name="timeToLive"></param>
+        public void SetExpireTTL(TimeSpan? timeToLive)
+        {
+            this.ExpireTTL = timeToLive;
+        }
+
+        /// <summary>
         ///     Setup capped collections during collection creation
         /// </summary>
         /// <param name="cappedMaxSizeMb">(Optional) Max Size in Mb of the Capped Collection. Default is 50mb.</param>
@@ -68,10 +89,10 @@ namespace Serilog.Sinks.MongoDB
             long? cappedMaxDocuments = null)
         {
             this.CollectionCreationOptions = new CreateCollectionOptions
-                                             {
-                                                 Capped = true,
-                                                 MaxSize = cappedMaxSizeMb * 1024 * 1024
-                                             };
+            {
+                Capped = true,
+                MaxSize = cappedMaxSizeMb * 1024 * 1024
+            };
 
             if (cappedMaxDocuments.HasValue)
                 this.CollectionCreationOptions.MaxDocuments = cappedMaxDocuments.Value;

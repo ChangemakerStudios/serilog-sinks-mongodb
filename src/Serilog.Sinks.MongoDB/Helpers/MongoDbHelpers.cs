@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using System;
-using System.Diagnostics;
 
 using MongoDB.Bson;
 using MongoDB.Driver;
 
+using Serilog.Debugging;
 using Serilog.Sinks.MongoDB;
 
 namespace Serilog.Helpers
@@ -59,9 +59,63 @@ namespace Serilog.Helpers
             {
                 database.CreateCollection(collectionName, collectionCreationOptions);
             }
-            catch (MongoCommandException e)
+            catch (MongoCommandException e) when (e.ErrorMessage.Contains("collection already exists"))
             {
-                if (!e.ErrorMessage.Equals("collection already exists")) throw;
+                // handled
+            }
+        }
+
+        internal static void VerifyExpireTTLSetup(
+            this IMongoDatabase database,
+            string collectionName,
+            TimeSpan? expireTtl)
+        {
+            const string ExpireTTLIndexName = "serilog_sink_expired_ttl";
+
+            var logCollection = database.GetCollection<LogEntry>(collectionName);
+
+            if (expireTtl.HasValue)
+            {
+                var indexKeysDefinition =
+                    Builders<LogEntry>.IndexKeys.Ascending(s => s.UtcTimeStamp);
+                var indexOptions = new CreateIndexOptions
+                    { Name = ExpireTTLIndexName, ExpireAfter = expireTtl };
+                var indexModel = new CreateIndexModel<LogEntry>(indexKeysDefinition, indexOptions);
+
+                try
+                {
+                    logCollection.Indexes.CreateOne(indexModel);
+
+                    return;
+                }
+                catch (MongoCommandException ex) when (ex.ErrorMessage.Contains("already exists with different options"))
+                {
+                    // handled -- just drop and recreate
+                    logCollection.Indexes.DropOne(ExpireTTLIndexName);
+                }
+
+                try
+                {
+                    // delete the index and re-create since it exists with different expiration value
+                    logCollection.Indexes.CreateOne(indexModel);
+                }
+                catch (MongoCommandException ex)
+                {
+                    SelfLog.WriteLine(
+                        "Failure dropping/creating MongoDB Expire TTL Index: {0}",
+                        ex.ErrorMessage);
+                }
+            }
+            else
+            {
+                // make sure the expire TTL index doesn't exist
+                try
+                {
+                    logCollection.Indexes.DropOne(ExpireTTLIndexName);
+                }
+                catch (MongoCommandException)
+                {
+                }
             }
         }
     }
