@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Linq;
 
 using MongoDB.Bson;
@@ -51,13 +52,28 @@ namespace Serilog.Helpers
         {
             if (value == null) return null;
 
-            if (value is ScalarValue scalar) return BsonValue.Create(scalar.Value);
+            if (value is ScalarValue scalar)
+            {
+                if (scalar.Value is Uri uri)
+                {
+                    return BsonValue.Create(uri.ToString());
+                }
+
+                if (scalar.Value is TimeSpan ts)
+                {
+                    return BsonValue.Create(ts.ToString());
+                }
+
+                return BsonValue.Create(scalar.Value);
+            }
 
             if (value is StructureValue sv)
+            {
                 return BsonDocument.Create(
                     sv.Properties.ToDictionary(
                         s => SanitizedElementName(s.Name),
                         s => ToBsonValue(s.Value)));
+            }
 
             if (value is DictionaryValue dv)
                 return BsonDocument.Create(
