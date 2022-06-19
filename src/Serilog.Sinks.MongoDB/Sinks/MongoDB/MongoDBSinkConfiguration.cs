@@ -35,7 +35,7 @@ namespace Serilog.Sinks.MongoDB
         public IMongoDatabase MongoDatabase { get; private set; }
 
         public bool Legacy { get; internal set; }
-        public RollingInterval RollingInterval { get; set; } = RollingInterval.Infinite;
+        public RollingInterval RollingInterval { get; private set; } = RollingInterval.Infinite;
 
         public void Validate()
         {
