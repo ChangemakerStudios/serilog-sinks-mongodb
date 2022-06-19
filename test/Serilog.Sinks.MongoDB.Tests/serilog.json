@@ -1,0 +1,23 @@
+{
+  "Serilog": {
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": {
+        "Microsoft": "Error",
+        "System": "Warning"
+      }
+    },
+    "WriteTo": [
+      {
+        "Name": "MongoDBBson",
+        "Args": {
+          "databaseUrl": "mongodb://localhost:27017/mongodb-sink",
+          "collectionName": "test",
+          "cappedMaxSizeMb": "1024",
+          "cappedMaxDocuments": "50000",
+          "rollingInterval": "Month"
+        }
+      }
+    ]
+  }
+}

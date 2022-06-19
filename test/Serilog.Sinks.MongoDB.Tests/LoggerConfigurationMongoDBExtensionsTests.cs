@@ -1,4 +1,6 @@
-﻿using MongoDB.Driver;
+﻿using System;
+using Microsoft.Extensions.Configuration;
+using MongoDB.Driver;
 using Serilog.Helpers;
 using Xunit;
 
@@ -26,6 +28,37 @@ namespace Serilog.Sinks.MongoDB.Tests
         public void Create_Collection_Based_On_Rolling_Interval_Minute()
         {
             TestCollectionAndDocumentExists(RollingInterval.Minute);
+        }
+
+        [Fact]
+        public void Create_Collection_With_Rolling_Interval_From_Configuration()
+        {
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("serilog.json")
+                .Build();
+
+            var now = DateTime.Now;
+            var collectionName = $"test{now.Year.ToString()}{now.Month.ToString()}";
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(configuration)
+                .CreateLogger();
+            
+            const string message = "some message logged into mongodb";
+            Log.Logger.Information(message);
+
+            Log.CloseAndFlush();
+            
+            var (mongoClient,mongoDatabase) = GetDatabase();
+            var collectionExists = mongoDatabase.CollectionExists(collectionName);
+            Assert.True(collectionExists);
+
+            var mongoCollection = mongoDatabase.GetCollection<LogEntryModel>(collectionName);
+            var existsDocument = mongoCollection.Find(x => x.RenderedMessage == message).Any();
+            
+            Assert.True(existsDocument);
+
+            mongoClient.DropDatabase(MongoDatabaseName);
+            
         }
 
         private static void TestCollectionAndDocumentExists(RollingInterval? rollingInterval = null)
