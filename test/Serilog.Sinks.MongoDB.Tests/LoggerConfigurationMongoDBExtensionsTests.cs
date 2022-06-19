@@ -36,9 +36,9 @@ namespace Serilog.Sinks.MongoDB.Tests
                 .WriteTo.MongoDBBson(configuration =>
                 {
                     configuration.SetMongoDatabase(mongoDatabase);
-                    configuration.SetCollectionName(MongoCollectionName);
                     if (rollingInterval is not null)
                         configuration.SetRollingInternal(rollingInterval.Value);
+                    configuration.SetCollectionName(MongoCollectionName);
                 }).CreateLogger();
 
             const string message = "some message logged into mongodb";
