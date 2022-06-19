@@ -69,7 +69,6 @@ namespace Serilog.Sinks.MongoDB
         public void SetRollingInternal(RollingInterval rollingInterval)
         {
             RollingInterval = rollingInterval;
-            CollectionName = RollingInterval.GetCollectionName(CollectionName);
         }
 
         /// <summary>
@@ -144,7 +143,7 @@ namespace Serilog.Sinks.MongoDB
                 throw new ArgumentOutOfRangeException(nameof(collectionName), "Must not be string.empty");
             }
 
-            CollectionName = RollingInterval.GetCollectionName(collectionName) ?? RollingInterval.GetCollectionName(MongoDBSinkDefaults.CollectionName);
+            CollectionName = collectionName ?? MongoDBSinkDefaults.CollectionName;
         }
 
         /// <summary>
