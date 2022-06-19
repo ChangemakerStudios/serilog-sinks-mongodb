@@ -35,6 +35,7 @@ namespace Serilog.Sinks.MongoDB
         public IMongoDatabase MongoDatabase { get; private set; }
 
         public bool Legacy { get; internal set; }
+        public RollingInterval RollingInterval { get; set; } = RollingInterval.Infinite;
 
         public void Validate()
         {
@@ -59,6 +60,12 @@ namespace Serilog.Sinks.MongoDB
                     "Expiration TTL is only supported on the MongoDBBson Sink");
             }
         }
+        
+        /// <summary>
+        ///     Set the RollingInterval. (Default: RollingInterval.Infinite)
+        /// </summary>
+        /// <param name="rollingInterval"></param>
+        public void SetRollingInternal(RollingInterval rollingInterval) => RollingInterval = rollingInterval;
 
         /// <summary>
         ///     Set the periodic batch timeout period. (Default: 2 seconds)
