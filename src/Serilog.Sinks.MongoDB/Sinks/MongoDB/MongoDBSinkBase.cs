@@ -51,7 +51,7 @@ namespace Serilog.Sinks.MongoDB
                 LazyThreadSafetyMode.ExecutionAndPublication);
         }
 
-        protected string CollectionName => _configuration.RollingInterval.GetCollectionName(_configuration.CollectionName);
+        protected string CollectionName => _configuration.CollectionName;
 
         protected static IMongoDatabase GetVerifiedMongoDatabaseFromConfiguration(
             MongoDBSinkConfiguration configuration)

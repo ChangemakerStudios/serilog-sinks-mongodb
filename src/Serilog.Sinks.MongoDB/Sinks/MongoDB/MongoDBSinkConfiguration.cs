@@ -15,6 +15,7 @@
 using System;
 
 using MongoDB.Driver;
+using Serilog.Helpers;
 
 namespace Serilog.Sinks.MongoDB
 {
@@ -60,12 +61,16 @@ namespace Serilog.Sinks.MongoDB
                     "Expiration TTL is only supported on the MongoDBBson Sink");
             }
         }
-        
+
         /// <summary>
         ///     Set the RollingInterval. (Default: RollingInterval.Infinite)
         /// </summary>
         /// <param name="rollingInterval"></param>
-        public void SetRollingInternal(RollingInterval rollingInterval) => RollingInterval = rollingInterval;
+        public void SetRollingInternal(RollingInterval rollingInterval)
+        {
+            RollingInterval = rollingInterval;
+            CollectionName = RollingInterval.GetCollectionName(CollectionName);
+        }
 
         /// <summary>
         ///     Set the periodic batch timeout period. (Default: 2 seconds)
@@ -139,7 +144,7 @@ namespace Serilog.Sinks.MongoDB
                 throw new ArgumentOutOfRangeException(nameof(collectionName), "Must not be string.empty");
             }
 
-            this.CollectionName = collectionName ?? MongoDBSinkDefaults.CollectionName;
+            CollectionName = RollingInterval.GetCollectionName(collectionName) ?? RollingInterval.GetCollectionName(MongoDBSinkDefaults.CollectionName);
         }
 
         /// <summary>
