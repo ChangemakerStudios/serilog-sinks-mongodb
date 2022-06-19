@@ -51,7 +51,7 @@ var log = new LoggerConfiguration()
 		
 		// sink will use the IMongoDatabase instance provided
 		cfg.SetMongoDatabase(mongoDbInstance);
-		configuration.SetRollingInternal(RollingInterval.Month);
+		cfg.SetRollingInternal(RollingInterval.Month);
     })
 	.CreateLogger();
 ```
