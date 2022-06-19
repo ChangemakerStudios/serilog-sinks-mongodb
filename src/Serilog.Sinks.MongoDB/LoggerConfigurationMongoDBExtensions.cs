@@ -50,7 +50,8 @@ namespace Serilog
             int batchPostingLimit = MongoDBSinkDefaults.BatchPostingLimit,
             TimeSpan? period = null,
             long? cappedMaxSizeMb = null,
-            long? cappedMaxDocuments = null)
+            long? cappedMaxDocuments = null,
+            RollingInterval? rollingInterval = null)
         {
             var cfg = new MongoDBSinkConfiguration();
 
@@ -68,6 +69,11 @@ namespace Serilog
                 cfg.SetCreateCappedCollection(
                     cappedMaxSizeMb ?? MongoDBSinkDefaults.CappedCollectionMaxSizeMb,
                     cappedMaxDocuments);
+            }
+
+            if (rollingInterval.HasValue)
+            {
+                cfg.SetRollingInternal(rollingInterval.Value);
             }
 
             cfg.Validate();
