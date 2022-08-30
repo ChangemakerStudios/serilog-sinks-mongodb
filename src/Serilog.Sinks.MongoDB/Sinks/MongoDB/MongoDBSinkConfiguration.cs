@@ -13,9 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Configuration;
 
 using MongoDB.Driver;
-using Serilog.Helpers;
 
 namespace Serilog.Sinks.MongoDB
 {
@@ -36,6 +36,7 @@ namespace Serilog.Sinks.MongoDB
         public IMongoDatabase MongoDatabase { get; private set; }
 
         public bool Legacy { get; internal set; }
+
         public RollingInterval RollingInterval { get; private set; } = RollingInterval.Infinite;
 
         public void Validate()
