@@ -8,10 +8,9 @@ A Serilog sink that writes events as documents to [MongoDB](http://mongodb.org).
 | **Platforms** - .NET 4.6.2, .NETStandard 1.5
 
 ### New in v5.x
-* Output structured MongoDB Bson logs by switching to the .MongoDBBson() extensions.
-* Rolling Log Collection Naming (Thanks to [Revazashvili](https://github.com/Revazashvili) for the PR!)
-* Existing the .MongoDB() extensions will continue to work converting logs to Json and then to Bson.
-* Expire TTL support for (v5.1.3 -- MongoDbBson sink only)
+* Output structured MongoDB Bson logs by switching to the .MongoDBBson() extensions. Existing the .MongoDB() extensions will continue to work converting logs to Json and then to Bson.
+* Rolling Log Collection Naming (Thanks to [Revazashvili](https://github.com/Revazashvili) for the PR!). MongoDBBson sink only.
+* Expire TTL support. MongoDBBson sink only.
 
 ### Configuration
 In the examples below, the sink is writing to the database `logs` with structured Bson. The default collection name is `log`, but a custom collection can be supplied with the optional `CollectionName` parameter. The database and collection will be created if they do not exist.
