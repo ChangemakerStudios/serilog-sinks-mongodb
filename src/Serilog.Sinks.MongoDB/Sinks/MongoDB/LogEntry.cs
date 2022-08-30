@@ -25,6 +25,9 @@ namespace Serilog.Sinks.MongoDB
 {
     public class LogEntry
     {
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
+
         [BsonRepresentation(BsonType.String)]
         public LogEventLevel Level { get; set; }
 

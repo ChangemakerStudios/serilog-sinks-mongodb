@@ -19,9 +19,6 @@ namespace Serilog.Helpers
 {
     internal static class RollingIntervalHelper
     {
-        private static Func<DateTime> _dateTimeNow = () => DateTime.Now;
-        private static DateTime DateTimeNow => _dateTimeNow();
-
         /// <summary>
         /// Returns collection name based on rolling interval.
         /// </summary>
@@ -31,23 +28,25 @@ namespace Serilog.Helpers
         /// <exception cref="ArgumentException">If passed invalid rolling interval.</exception>
         internal static string GetCollectionName(this RollingInterval interval, string collectionName)
         {
+            if (interval == RollingInterval.Infinite) return collectionName;
+
+            return $"{collectionName}_{DateTime.Now.ToString(GetDateTimeFormatForInterval(interval))}";
+        }
+
+        internal static string GetDateTimeFormatForInterval(this RollingInterval interval)
+        {
             switch (interval)
             {
-                case RollingInterval.Infinite:
-                    return collectionName;
                 case RollingInterval.Year:
-                    return $"{collectionName}{DateTimeNow.Year.ToString()}";
+                    return "yyyy";
                 case RollingInterval.Month:
-                    return $"{collectionName}{DateTimeNow.Year.ToString()}{DateTimeNow.Month.ToString()}";
+                    return "yyyyMM";
                 case RollingInterval.Day:
-                    return
-                        $"{collectionName}{DateTimeNow.Year.ToString()}{DateTimeNow.Month.ToString()}{DateTimeNow.Day.ToString()}";
+                    return "yyyyMMdd";
                 case RollingInterval.Hour:
-                    return
-                        $"{collectionName}{DateTimeNow.Year.ToString()}{DateTimeNow.Month.ToString()}{DateTimeNow.Day.ToString()}{DateTimeNow.Hour.ToString()}";
+                    return "yyyyMMddhh";
                 case RollingInterval.Minute:
-                    return
-                        $"{collectionName}{DateTimeNow.Year.ToString()}{DateTimeNow.Month.ToString()}{DateTimeNow.Day.ToString()}{DateTimeNow.Hour.ToString()}{DateTimeNow.Minute.ToString()}";
+                    return "yyyyMMddhhmm";
                 default:
                     throw new ArgumentException("Invalid rolling interval");
             }

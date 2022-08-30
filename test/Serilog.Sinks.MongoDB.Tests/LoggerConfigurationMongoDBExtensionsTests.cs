@@ -27,27 +27,27 @@ public class LoggerConfigurationMongoDbExtensionsTests
             ? MongoCollectionName
             : rollingInterval.Value.GetCollectionName(MongoCollectionName);
 
-        Log.Logger = new LoggerConfiguration()
-            .WriteTo.MongoDBBson(
-                configuration =>
-                {
-                    configuration.SetMongoDatabase(mongoDatabase);
-                    if (rollingInterval is not null)
-                        configuration.SetRollingInternal(rollingInterval.Value);
-                    configuration.SetCollectionName(MongoCollectionName);
-                }).CreateLogger();
-
         const string Message = "some message logged into mongodb";
 
-        Log.Logger.Information(Message);
+        using (var logger = new LoggerConfiguration()
+                   .WriteTo.MongoDBBson(
+                       configuration =>
+                       {
+                           configuration.SetMongoDatabase(mongoDatabase);
+                           if (rollingInterval is not null)
+                               configuration.SetRollingInternal(rollingInterval.Value);
+                           configuration.SetCollectionName(MongoCollectionName);
+                       }).CreateLogger())
+        {
 
-        Log.CloseAndFlush();
+            logger.Information(Message);
+        }
 
         var collectionExists = mongoDatabase.CollectionExists(expectedCollectionName);
 
         collectionExists.Should().BeTrue();
 
-        var mongoCollection = mongoDatabase.GetCollection<LogEntryModel>(expectedCollectionName);
+        var mongoCollection = mongoDatabase.GetCollection<LogEntry>(expectedCollectionName);
         var existsDocument = mongoCollection.Find(x => x.RenderedMessage == Message).Any();
 
         existsDocument.Should().BeTrue("Rendered Message Should Exist");
@@ -86,23 +86,23 @@ public class LoggerConfigurationMongoDbExtensionsTests
             .AddJsonFile("serilog.json")
             .Build();
 
-        var now = DateTime.Now;
-        var collectionName = $"test{now.Year}{now.Month}";
-        Log.Logger = new LoggerConfiguration()
-            .ReadFrom.Configuration(configuration)
-            .CreateLogger();
+        var collectionName = RollingInterval.Month.GetCollectionName("test");
 
         const string Message = "some message logged into mongodb";
-        Log.Logger.Information(Message);
 
-        Log.CloseAndFlush();
+        using (var logger = new LoggerConfiguration()
+                   .ReadFrom.Configuration(configuration)
+                   .CreateLogger())
+        {
+            logger.Information(Message);
+        }
 
         var (mongoClient, mongoDatabase) = GetDatabase();
         var collectionExists = mongoDatabase.CollectionExists(collectionName);
 
         collectionExists.Should().BeTrue();
 
-        var mongoCollection = mongoDatabase.GetCollection<LogEntryModel>(collectionName);
+        var mongoCollection = mongoDatabase.GetCollection<LogEntry>(collectionName);
         var existsDocument = mongoCollection.Find(x => x.RenderedMessage == Message).Any();
 
         existsDocument.Should().BeTrue();
