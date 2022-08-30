@@ -1,6 +1,6 @@
 # Serilog.Sinks.MongoDB
 
-![Build status](https://github.com/ChangemakerStudios/ serilog-sinks-mongodb/actions/workflows/deploy.yml/badge.svg)
+![Build status](https://github.com/ChangemakerStudios/serilog-sinks-mongodb/actions/workflows/deploy.yml/badge.svg)
 
 A Serilog sink that writes events as documents to [MongoDB](http://mongodb.org).
 
