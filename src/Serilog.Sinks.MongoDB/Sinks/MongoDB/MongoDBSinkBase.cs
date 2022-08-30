@@ -51,8 +51,9 @@ namespace Serilog.Sinks.MongoDB
                 LazyThreadSafetyMode.ExecutionAndPublication);
         }
 
-        protected string CollectionName => this._configuration.CollectionName;
+        protected string CollectionName => _configuration.CollectionName;
 
+        protected RollingInterval RollingInterval => _configuration.RollingInterval;
         protected static IMongoDatabase GetVerifiedMongoDatabaseFromConfiguration(
             MongoDBSinkConfiguration configuration)
         {
@@ -79,7 +80,8 @@ namespace Serilog.Sinks.MongoDB
         /// <returns></returns>
         public IMongoCollection<T> GetCollection<T>()
         {
-            return this._mongoDatabase.Value.GetCollection<T>(this.CollectionName);
+            var collectionName = RollingInterval.GetCollectionName(CollectionName);
+            return this._mongoDatabase.Value.GetCollection<T>(collectionName);
         }
 
         protected Task InsertMany<T>(IEnumerable<T> objects)

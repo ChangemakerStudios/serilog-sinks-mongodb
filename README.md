@@ -51,6 +51,7 @@ var log = new LoggerConfiguration()
 		
 		// sink will use the IMongoDatabase instance provided
 		cfg.SetMongoDatabase(mongoDbInstance);
+		cfg.SetRollingInternal(RollingInterval.Month);
     })
 	.CreateLogger();
 ```
@@ -75,7 +76,8 @@ Keys and values are not case-sensitive. This is an example of configuring the Mo
             "databaseUrl": "mongodb://username:password@ip:port/dbName?authSource=admin",
             "collectionName": "logs",
             "cappedMaxSizeMb": "1024",
-            "cappedMaxDocuments": "50000"
+            "cappedMaxDocuments": "50000",
+            "rollingInterval": "Month"
         }
       } 
     ]
