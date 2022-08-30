@@ -64,6 +64,11 @@ namespace Serilog.Helpers
                     return BsonValue.Create(ts.ToString());
                 }
 
+                if (scalar.Value is DateTimeOffset dto)
+                {
+                    return BsonValue.Create(dto.ToString());
+                }
+
                 return BsonValue.Create(scalar.Value);
             }
 
