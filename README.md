@@ -1,6 +1,6 @@
 # Serilog.Sinks.MongoDB
 
-[![Build status](https://ci.appveyor.com/api/projects/status/gvdw42mwa7a24ny3?svg=true)](https://ci.appveyor.com/project/Jaben/serilog-sinks-mongodb)
+![Build status](https://github.com/ChangemakerStudios/ serilog-sinks-mongodb/actions/workflows/deploy.yml/badge.svg)
 
 A Serilog sink that writes events as documents to [MongoDB](http://mongodb.org).
 
