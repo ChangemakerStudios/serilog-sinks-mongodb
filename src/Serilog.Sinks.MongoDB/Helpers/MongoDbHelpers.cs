@@ -58,7 +58,9 @@ namespace Serilog.Helpers
             {
                 database.CreateCollection(collectionName, collectionCreationOptions);
             }
-            catch (MongoCommandException e) when (e.ErrorMessage.Contains("collection already exists"))
+            catch (MongoCommandException e) when (e.ErrorMessage.Contains(
+                                                      "collection already exists",
+                                                      StringComparison.InvariantCultureIgnoreCase))
             {
                 // handled
             }
