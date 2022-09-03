@@ -24,93 +24,91 @@ using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Helpers;
 
-namespace Serilog.Sinks.MongoDB
+namespace Serilog.Sinks.MongoDB;
+
+public class MongoDBSinkLegacy : MongoDBSinkBase
 {
-    public class MongoDBSinkLegacy : MongoDBSinkBase
+    private readonly ITextFormatter _formatter;
+
+    public MongoDBSinkLegacy(
+        MongoDBSinkConfiguration configuration,
+        IFormatProvider? formatProvider = null,
+        ITextFormatter? textFormatter = null)
+        : base(configuration)
     {
-        private readonly ITextFormatter _formatter;
+        this._formatter = textFormatter ?? new MongoDBJsonFormatter(
+            renderMessage: true,
+            formatProvider: formatProvider);
+    }
 
-        public MongoDBSinkLegacy(
-            MongoDBSinkConfiguration configuration,
-            IFormatProvider? formatProvider = null,
-            ITextFormatter? textFormatter = null)
-            : base(configuration)
+    /// <summary>
+    ///     Creates Json from the log events enumerable
+    /// </summary>
+    /// <param name="events"></param>
+    /// <returns></returns>
+    private string GenerateJson(IEnumerable<LogEvent> events)
+    {
+        var logEventLines = new List<string>();
+
+        foreach (var logEvent in events)
         {
-            this._formatter = textFormatter ?? new MongoDBJsonFormatter(
-                renderMessage: true,
-                formatProvider: formatProvider);
-        }
+            string logEventLine;
 
-        /// <summary>
-        /// Creates Json from the log events enumerable
-        /// </summary>
-        /// <param name="events"></param>
-        /// <returns></returns>
-        private string GenerateJson(IEnumerable<LogEvent> events)
-        {
-            var logEventLines = new List<string>();
-
-            foreach (var logEvent in events)
+            using (var writer = new StringWriter())
             {
-                string logEventLine;
-
-                using (var writer = new StringWriter())
-                {
-                    this._formatter.Format(logEvent, writer);
-                    logEventLine = writer.ToString().Trim();
-                }
-
-                if (logEventLine.EndsWith("}"))
-                {
-                    // remove so we can add Utc to end
-                    logEventLine = logEventLine.Substring(0, logEventLine.Length - 1);
-                }
-
-                logEventLine += $@", ""UtcTimestamp"": ""{logEvent.Timestamp.ToUniversalTime().DateTime:u}"" }}";
-
-                logEventLines.Add(logEventLine);
+                this._formatter.Format(logEvent, writer);
+                logEventLine = writer.ToString().Trim();
             }
 
-            return $@"{{ ""logEvents"": [{string.Join(",", logEventLines)}] }}";
+            if (logEventLine.EndsWith("}"))
+                // remove so we can add Utc to end
+                logEventLine = logEventLine.Substring(0, logEventLine.Length - 1);
+
+            logEventLine +=
+                $@", ""UtcTimestamp"": ""{logEvent.Timestamp.ToUniversalTime().DateTime:u}"" }}";
+
+            logEventLines.Add(logEventLine);
         }
 
-        /// <summary>
-        ///     Generate BSON documents from LogEvents.
-        /// </summary>
-        /// <param name="events">The events.</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException">
-        /// </exception>
-        protected IReadOnlyCollection<BsonDocument> GenerateBsonDocuments(
-            IEnumerable<LogEvent> events)
-        {
-            if (events == null) throw new ArgumentNullException(nameof(events));
+        return $@"{{ ""logEvents"": [{string.Join(",", logEventLines)}] }}";
+    }
 
-            var json = this.GenerateJson(events);
-            var bson = BsonDocument.Parse(json);
+    /// <summary>
+    ///     Generate BSON documents from LogEvents.
+    /// </summary>
+    /// <param name="events">The events.</param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException">
+    /// </exception>
+    protected IReadOnlyCollection<BsonDocument> GenerateBsonDocuments(
+        IEnumerable<LogEvent> events)
+    {
+        if (events == null) throw new ArgumentNullException(nameof(events));
 
-            return bson["logEvents"].AsBsonArray
-                .Select(x => x.AsBsonDocument.SanitizeDocumentRecursive()).ToList();
-        }
+        var json = this.GenerateJson(events);
+        var bson = BsonDocument.Parse(json);
 
-        /// <summary>
-        ///     Emit a batch of log events, running asynchronously.
-        /// </summary>
-        /// <param name="events">The events to emit.</param>
-        /// <returns></returns>
-        /// <remarks>
-        ///     Override either
-        ///     <see
-        ///         cref="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.EmitBatch(System.Collections.Generic.IEnumerable{Serilog.Events.LogEvent})" />
-        ///     or
-        ///     <see
-        ///         cref="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.EmitBatchAsync(System.Collections.Generic.IEnumerable{Serilog.Events.LogEvent})" />
-        ///     ,
-        ///     not both. Overriding EmitBatch() is preferred.
-        /// </remarks>
-        protected override Task EmitBatchAsync(IEnumerable<LogEvent> events)
-        {
-            return this.InsertMany(this.GenerateBsonDocuments(events));
-        }
+        return bson["logEvents"].AsBsonArray
+            .Select(x => x.AsBsonDocument.SanitizeDocumentRecursive()).ToList();
+    }
+
+    /// <summary>
+    ///     Emit a batch of log events, running asynchronously.
+    /// </summary>
+    /// <param name="events">The events to emit.</param>
+    /// <returns></returns>
+    /// <remarks>
+    ///     Override either
+    ///     <see
+    ///         cref="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.EmitBatch(System.Collections.Generic.IEnumerable{Serilog.Events.LogEvent})" />
+    ///     or
+    ///     <see
+    ///         cref="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.EmitBatchAsync(System.Collections.Generic.IEnumerable{Serilog.Events.LogEvent})" />
+    ///     ,
+    ///     not both. Overriding EmitBatch() is preferred.
+    /// </remarks>
+    protected override Task EmitBatchAsync(IEnumerable<LogEvent> events)
+    {
+        return this.InsertMany(this.GenerateBsonDocuments(events));
     }
 }

@@ -13,43 +13,45 @@
 // limitations under the License.
 
 using System;
+using System.Globalization;
+
 using Serilog.Sinks.MongoDB;
 
-namespace Serilog.Helpers
+namespace Serilog.Helpers;
+
+internal static class RollingIntervalHelper
 {
-    internal static class RollingIntervalHelper
+    /// <summary>
+    ///     Returns collection name based on rolling interval.
+    /// </summary>
+    /// <example>log202210</example>
+    /// <param name="interval">The <see cref="RollingInterval" />.</param>
+    /// <param name="collectionName">Collection name.</param>
+    /// <exception cref="ArgumentException">If passed invalid rolling interval.</exception>
+    internal static string GetCollectionName(this RollingInterval interval, string collectionName)
     {
-        /// <summary>
-        /// Returns collection name based on rolling interval.
-        /// </summary>
-        /// <example>log202210</example>
-        /// <param name="interval">The <see cref="RollingInterval"/>.</param>
-        /// <param name="collectionName">Collection name.</param>
-        /// <exception cref="ArgumentException">If passed invalid rolling interval.</exception>
-        internal static string GetCollectionName(this RollingInterval interval, string collectionName)
-        {
-            if (interval == RollingInterval.Infinite) return collectionName;
+        if (interval == RollingInterval.Infinite) return collectionName;
 
-            return $"{collectionName}_{DateTime.Now.ToString(GetDateTimeFormatForInterval(interval))}";
-        }
+        return
+            $"{collectionName}_{DateTime.Now.ToString(GetDateTimeFormatForInterval(interval), CultureInfo.InvariantCulture)}";
+    }
 
-        internal static string GetDateTimeFormatForInterval(this RollingInterval interval)
+    internal static string GetDateTimeFormatForInterval(this RollingInterval interval)
+    {
+        switch (interval)
         {
-            switch (interval)
-            {
-                case RollingInterval.Year:
-                    return "yyyy";
-                case RollingInterval.Month:
-                    return "yyyyMM";
-                case RollingInterval.Day:
-                    return "yyyyMMdd";
-                case RollingInterval.Hour:
-                    return "yyyyMMddhh";
-                case RollingInterval.Minute:
-                    return "yyyyMMddhhmm";
-                default:
-                    throw new ArgumentException("Invalid rolling interval");
-            }
+            case RollingInterval.Year:
+                return "yyyy";
+            case RollingInterval.Month:
+                return "yyyyMM";
+            case RollingInterval.Day:
+                return "yyyyMMdd";
+            case RollingInterval.Hour:
+                return "yyyyMMddhh";
+            case RollingInterval.Minute:
+                return "yyyyMMddhhmm";
+            default:
+                throw new ArgumentException("Invalid rolling interval");
         }
     }
 }

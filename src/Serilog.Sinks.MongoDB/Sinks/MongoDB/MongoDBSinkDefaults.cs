@@ -14,29 +14,28 @@
 
 using System;
 
-namespace Serilog.Sinks.MongoDB
+namespace Serilog.Sinks.MongoDB;
+
+public static class MongoDBSinkDefaults
 {
-    public static class MongoDBSinkDefaults
-    {
-        /// <summary>
-        ///     A reasonable default for the number of events posted in
-        ///     each batch.
-        /// </summary>
-        public const int BatchPostingLimit = 50;
+    /// <summary>
+    ///     A reasonable default for the number of events posted in
+    ///     each batch.
+    /// </summary>
+    public const int BatchPostingLimit = 50;
 
-        /// <summary>
-        ///     The default name for the log collection.
-        /// </summary>
-        public const string CollectionName = "log";
+    /// <summary>
+    ///     The default name for the log collection.
+    /// </summary>
+    public const string CollectionName = "log";
 
-        /// <summary>
-        ///     Default capped collection max size in megabytes
-        /// </summary>
-        public const int CappedCollectionMaxSizeMb = 50;
+    /// <summary>
+    ///     Default capped collection max size in megabytes
+    /// </summary>
+    public const int CappedCollectionMaxSizeMb = 50;
 
-        /// <summary>
-        ///     A reasonable default time to wait between checking for event batches.
-        /// </summary>
-        public static readonly TimeSpan BatchPeriod = TimeSpan.FromSeconds(2);
-    }
+    /// <summary>
+    ///     A reasonable default time to wait between checking for event batches.
+    /// </summary>
+    public static readonly TimeSpan BatchPeriod = TimeSpan.FromSeconds(2);
 }
