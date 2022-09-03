@@ -24,15 +24,15 @@ namespace Serilog.Sinks.MongoDB
 
         public int BatchPostingLimit { get; private set; } = MongoDBSinkDefaults.BatchPostingLimit;
 
-        public CreateCollectionOptions CollectionCreationOptions { get; private set; }
+        public CreateCollectionOptions? CollectionCreationOptions { get; private set; }
 
         public TimeSpan? ExpireTTL { get; private set; }
 
         public TimeSpan BatchPeriod { get; private set; } = MongoDBSinkDefaults.BatchPeriod;
 
-        public MongoUrl MongoUrl { get; private set; }
+        public MongoUrl? MongoUrl { get; private set; }
 
-        public IMongoDatabase MongoDatabase { get; private set; }
+        public IMongoDatabase? MongoDatabase { get; private set; }
 
         public bool Legacy { get; internal set; }
 

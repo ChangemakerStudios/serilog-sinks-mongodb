@@ -26,20 +26,20 @@ namespace Serilog.Sinks.MongoDB
     public class LogEntry
     {
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
+        public string? Id { get; set; }
 
         [BsonRepresentation(BsonType.String)]
         public LogEventLevel Level { get; set; }
 
         public DateTime UtcTimeStamp { get; set; }
 
-        public MessageTemplate MessageTemplate { get; set; }
+        public MessageTemplate? MessageTemplate { get; set; }
 
-        public string RenderedMessage { get; set; }
+        public string? RenderedMessage { get; set; }
 
-        public BsonDocument Properties { get; set; }
+        public BsonDocument? Properties { get; set; }
 
-        public BsonDocument Exception { get; set; }
+        public BsonDocument? Exception { get; set; }
 
         public static LogEntry MapFrom(LogEvent logEvent)
         {

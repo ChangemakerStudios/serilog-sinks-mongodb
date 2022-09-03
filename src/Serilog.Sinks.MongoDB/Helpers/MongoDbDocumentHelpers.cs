@@ -31,6 +31,8 @@ namespace Serilog.Helpers
         /// <returns></returns>
         internal static BsonDocument SanitizeDocumentRecursive(this BsonDocument document)
         {
+            if (document == null) throw new ArgumentNullException(nameof(document));
+
             var sanitizedElements = document.Select(
                 e => new BsonElement(
                     SanitizedElementName(e.Name),
@@ -41,14 +43,14 @@ namespace Serilog.Helpers
             return new BsonDocument(sanitizedElements);
         }
 
-        internal static string SanitizedElementName(this string name)
+        internal static string SanitizedElementName(this string? name)
         {
             if (name == null) return "[NULL]";
 
             return name.Replace('.', '-').Replace('$', '_');
         }
 
-        internal static BsonValue ToBsonValue(this LogEventPropertyValue value)
+        internal static BsonValue? ToBsonValue(this LogEventPropertyValue? value)
         {
             if (value == null) return null;
 

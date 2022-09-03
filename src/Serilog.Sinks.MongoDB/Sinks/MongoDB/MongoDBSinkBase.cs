@@ -59,7 +59,7 @@ namespace Serilog.Sinks.MongoDB
         {
             var mongoDatabase = configuration.MongoDatabase
                                 ?? new MongoClient(configuration.MongoUrl).GetDatabase(
-                                    configuration.MongoUrl.DatabaseName);
+                                    configuration.MongoUrl!.DatabaseName);
 
             // connection attempt
             mongoDatabase.VerifyCollectionExists(

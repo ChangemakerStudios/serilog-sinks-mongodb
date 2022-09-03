@@ -47,10 +47,9 @@ namespace Serilog.Helpers
         internal static void VerifyCollectionExists(
             this IMongoDatabase database,
             string collectionName,
-            CreateCollectionOptions collectionCreationOptions = null)
+            CreateCollectionOptions? collectionCreationOptions = null)
         {
             if (database == null) throw new ArgumentNullException(nameof(database));
-
             if (collectionName == null) throw new ArgumentNullException(nameof(collectionName));
 
             if (database.CollectionExists(collectionName)) return;

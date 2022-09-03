@@ -4,6 +4,7 @@
 		<ProjectGuid>2605ed8c-c12a-42fb-9825-32ffea7b4301</ProjectGuid>
 		<RootNamespace>Serilog.Sinks.MongoDB</RootNamespace>
 		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<PropertyGroup>

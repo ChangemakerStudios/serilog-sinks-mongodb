@@ -32,8 +32,8 @@ namespace Serilog.Sinks.MongoDB
 
         public MongoDBSinkLegacy(
             MongoDBSinkConfiguration configuration,
-            IFormatProvider formatProvider = null,
-            ITextFormatter textFormatter = null)
+            IFormatProvider? formatProvider = null,
+            ITextFormatter? textFormatter = null)
             : base(configuration)
         {
             this._formatter = textFormatter ?? new MongoDBJsonFormatter(
