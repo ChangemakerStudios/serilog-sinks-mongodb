@@ -29,9 +29,9 @@ jobs:
         useConfigFile: true
         
     - name: Pack
-      run: dotnet pack -c Release -p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersion }}
+      run: dotnet pack -c Release -p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersion }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
         
     - name: Publish
       if: github.event_name != 'pull_request' && (github.ref_name == 'master')
       run: |
-        dotnet nuget push **/*.nupkg --source 'https://api.nuget.org/v3/index.json' --skip-duplicate -k ${{ secrets.NUGETKEY }} --no-symbols 1 
+        dotnet nuget push **/*.nupkg --source 'https://api.nuget.org/v3/index.json' -k ${{ secrets.NUGETKEY }}
