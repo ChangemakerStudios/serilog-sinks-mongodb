@@ -41,6 +41,7 @@ namespace Serilog
         /// <param name="period"></param>
         /// <param name="cappedMaxSizeMb"></param>
         /// <param name="cappedMaxDocuments"></param>
+        /// <param name="rollingInterval"></param>
         /// <returns></returns>
         public static LoggerConfiguration MongoDBBson(
             this LoggerSinkConfiguration loggerConfiguration,
@@ -50,7 +51,8 @@ namespace Serilog
             int batchPostingLimit = MongoDBSinkDefaults.BatchPostingLimit,
             TimeSpan? period = null,
             long? cappedMaxSizeMb = null,
-            long? cappedMaxDocuments = null)
+            long? cappedMaxDocuments = null,
+            RollingInterval? rollingInterval = null)
         {
             var cfg = new MongoDBSinkConfiguration();
 
@@ -68,6 +70,11 @@ namespace Serilog
                 cfg.SetCreateCappedCollection(
                     cappedMaxSizeMb ?? MongoDBSinkDefaults.CappedCollectionMaxSizeMb,
                     cappedMaxDocuments);
+            }
+
+            if (rollingInterval.HasValue)
+            {
+                cfg.SetRollingInternal(rollingInterval.Value);
             }
 
             cfg.Validate();
@@ -125,8 +132,8 @@ namespace Serilog
             LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum,
             int batchPostingLimit = MongoDBSinkDefaults.BatchPostingLimit,
             TimeSpan? period = null,
-            IFormatProvider formatProvider = null,
-            ITextFormatter mongoDBJsonFormatter = null)
+            IFormatProvider? formatProvider = null,
+            ITextFormatter? mongoDBJsonFormatter = null)
         {
             if (loggerConfiguration == null)
                 throw new ArgumentNullException(nameof(loggerConfiguration));
@@ -169,8 +176,8 @@ namespace Serilog
             string collectionName = MongoDBSinkDefaults.CollectionName,
             int batchPostingLimit = MongoDBSinkDefaults.BatchPostingLimit,
             TimeSpan? period = null,
-            IFormatProvider formatProvider = null,
-            ITextFormatter mongoDBJsonFormatter = null)
+            IFormatProvider? formatProvider = null,
+            ITextFormatter? mongoDBJsonFormatter = null)
         {
             if (loggerConfiguration == null)
                 throw new ArgumentNullException(nameof(loggerConfiguration));
@@ -219,8 +226,8 @@ namespace Serilog
             string collectionName = MongoDBSinkDefaults.CollectionName,
             int batchPostingLimit = MongoDBSinkDefaults.BatchPostingLimit,
             TimeSpan? period = null,
-            IFormatProvider formatProvider = null,
-            ITextFormatter mongoDBJsonFormatter = null)
+            IFormatProvider? formatProvider = null,
+            ITextFormatter? mongoDBJsonFormatter = null)
         {
             if (loggerConfiguration == null)
                 throw new ArgumentNullException(nameof(loggerConfiguration));
@@ -268,8 +275,8 @@ namespace Serilog
             string collectionName = MongoDBSinkDefaults.CollectionName,
             int batchPostingLimit = MongoDBSinkDefaults.BatchPostingLimit,
             TimeSpan? period = null,
-            IFormatProvider formatProvider = null,
-            ITextFormatter mongoDBJsonFormatter = null)
+            IFormatProvider? formatProvider = null,
+            ITextFormatter? mongoDBJsonFormatter = null)
         {
             if (loggerConfiguration == null)
                 throw new ArgumentNullException(nameof(loggerConfiguration));

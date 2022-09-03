@@ -46,9 +46,9 @@ namespace Serilog.Sinks.MongoDB
         /// <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
         public MongoDBJsonFormatter(
             bool omitEnclosingObject = false,
-            string closingDelimiter = null,
+            string? closingDelimiter = null,
             bool renderMessage = false,
-            IFormatProvider formatProvider = null)
+            IFormatProvider? formatProvider = null)
             : base(omitEnclosingObject, closingDelimiter, renderMessage, formatProvider)
         {
             this._dateTimeWriters = new Dictionary<Type, Action<object, TextWriter>>
@@ -63,7 +63,7 @@ namespace Serilog.Sinks.MongoDB
         /// </summary>
         protected override void WriteJsonProperty(
             string name,
-            object value,
+            object? value,
             ref string precedingDelimiter,
             TextWriter output)
         {

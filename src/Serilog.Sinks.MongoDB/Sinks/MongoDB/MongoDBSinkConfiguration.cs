@@ -24,17 +24,19 @@ namespace Serilog.Sinks.MongoDB
 
         public int BatchPostingLimit { get; private set; } = MongoDBSinkDefaults.BatchPostingLimit;
 
-        public CreateCollectionOptions CollectionCreationOptions { get; private set; }
+        public CreateCollectionOptions? CollectionCreationOptions { get; private set; }
 
         public TimeSpan? ExpireTTL { get; private set; }
 
         public TimeSpan BatchPeriod { get; private set; } = MongoDBSinkDefaults.BatchPeriod;
 
-        public MongoUrl MongoUrl { get; private set; }
+        public MongoUrl? MongoUrl { get; private set; }
 
-        public IMongoDatabase MongoDatabase { get; private set; }
+        public IMongoDatabase? MongoDatabase { get; private set; }
 
         public bool Legacy { get; internal set; }
+
+        public RollingInterval RollingInterval { get; private set; } = RollingInterval.Infinite;
 
         public void Validate()
         {
@@ -58,6 +60,15 @@ namespace Serilog.Sinks.MongoDB
                     nameof(ExpireTTL),
                     "Expiration TTL is only supported on the MongoDBBson Sink");
             }
+        }
+
+        /// <summary>
+        ///     Set the RollingInterval. (Default: RollingInterval.Infinite)
+        /// </summary>
+        /// <param name="rollingInterval"></param>
+        public void SetRollingInternal(RollingInterval rollingInterval)
+        {
+            RollingInterval = rollingInterval;
         }
 
         /// <summary>
@@ -132,7 +143,7 @@ namespace Serilog.Sinks.MongoDB
                 throw new ArgumentOutOfRangeException(nameof(collectionName), "Must not be string.empty");
             }
 
-            this.CollectionName = collectionName ?? MongoDBSinkDefaults.CollectionName;
+            CollectionName = collectionName ?? MongoDBSinkDefaults.CollectionName;
         }
 
         /// <summary>

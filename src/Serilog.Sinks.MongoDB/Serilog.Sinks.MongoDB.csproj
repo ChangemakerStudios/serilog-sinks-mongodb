@@ -1,31 +1,53 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>net452;netstandard15</TargetFrameworks>
-    <ProjectGuid>2605ed8c-c12a-42fb-9825-32ffea7b4301</ProjectGuid>
-    <RootNamespace>Serilog.Sinks.MongoDB</RootNamespace>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.1;netstandard2.0;net472</TargetFrameworks>
+		<ProjectGuid>2605ed8c-c12a-42fb-9825-32ffea7b4301</ProjectGuid>
+		<RootNamespace>Serilog.Sinks.MongoDB</RootNamespace>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <VersionPrefix>5.1.5</VersionPrefix>
-    <Authors>Kiran Makkapati, Serilog Contributors</Authors>
-    <Copyright>Copyright © Serilog Contributors 2014-2022</Copyright>
-    <Description>The MongoDB sink for Serilog</Description>
-    <PackageIconUrl>http://serilog.net/images/serilog-sink-nuget.png</PackageIconUrl>
-    <PackageId>Serilog.Sinks.MongoDB</PackageId>
-    <PackageProjectUrl>http://serilog.net</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/ChangemakerStudios/serilog-sinks-mongodb</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageTags>serilog, mongodb</PackageTags>
-  </PropertyGroup>
+	<PropertyGroup>
+		<PackageVersion>5.2.0</PackageVersion>
+		<Authors>Kiran Makkapati, Jaben Cargman, Serilog Contributors</Authors>
+		<Copyright>Copyright © Serilog Contributors 2014-2022</Copyright>
+		<Description>The MongoDB sink for Serilog</Description>
+		<PackageIconUrl>http://serilog.net/images/serilog-sink-nuget.png</PackageIconUrl>
+		<PackageId>Serilog.Sinks.MongoDB</PackageId>
+		<PackageProjectUrl>http://serilog.net</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/ChangemakerStudios/serilog-sinks-mongodb</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>serilog, mongodb</PackageTags>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="MongoDB.Driver" Version="2.13.1" />
-    <PackageReference Include="Serilog" Version="2.10.0" />
-    <PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
-    <PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="2.3.0" />
-  </ItemGroup>
+	<PropertyGroup>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	</PropertyGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
-    <Reference Include="System.Configuration" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+		<PackageReference Include="Nullable" Version="1.3.1" PrivateAssets="All" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Serilog" Version="2.11.0" />
+		<PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
+		<PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="2.3.1" />
+		<PackageReference Include="MongoDB.Driver" Version="2.17.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\README.md" Pack="true" PackagePath="\"/>
+	</ItemGroup>
+
+	<ItemGroup>
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+			<_Parameter1>$(MsBuildProjectName).Tests</_Parameter1>
+		</AssemblyAttribute>
+	</ItemGroup>
+
 </Project>
