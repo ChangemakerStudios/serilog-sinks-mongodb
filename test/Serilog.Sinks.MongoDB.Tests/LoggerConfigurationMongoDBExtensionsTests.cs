@@ -1,6 +1,4 @@
-﻿using System;
-
-using FluentAssertions;
+﻿using FluentAssertions;
 
 using Microsoft.Extensions.Configuration;
 
@@ -39,7 +37,6 @@ public class LoggerConfigurationMongoDbExtensionsTests
                            configuration.SetCollectionName(MongoCollectionName);
                        }).CreateLogger())
         {
-
             logger.Information(Message);
         }
 

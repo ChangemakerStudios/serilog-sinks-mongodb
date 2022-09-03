@@ -20,103 +20,103 @@ using MongoDB.Driver;
 using Serilog.Debugging;
 using Serilog.Sinks.MongoDB;
 
-namespace Serilog.Helpers
+namespace Serilog.Helpers;
+
+internal static class MongoDbHelper
 {
-    internal static class MongoDbHelper
+    /// <summary>
+    ///     Returns true if a collection exists on the mongodb server.
+    /// </summary>
+    /// <param name="database">The database.</param>
+    /// <param name="collectionName">Name of the collection.</param>
+    /// <returns></returns>
+    internal static bool CollectionExists(this IMongoDatabase database, string collectionName)
     {
-        /// <summary>
-        ///     Returns true if a collection exists on the mongodb server.
-        /// </summary>
-        /// <param name="database">The database.</param>
-        /// <param name="collectionName">Name of the collection.</param>
-        /// <returns></returns>
-        internal static bool CollectionExists(this IMongoDatabase database, string collectionName)
+        var filter = new BsonDocument("name", collectionName);
+        var collectionCursor =
+            database.ListCollections(new ListCollectionsOptions { Filter = filter });
+        return collectionCursor.Any();
+    }
+
+    /// <summary>
+    ///     Verifies the collection exists. If it doesn't, create it using the Collection Creation Options provided.
+    /// </summary>
+    /// <param name="database">The database.</param>
+    /// <param name="collectionName">Name of the collection.</param>
+    /// <param name="collectionCreationOptions">The collection creation options.</param>
+    internal static void VerifyCollectionExists(
+        this IMongoDatabase database,
+        string collectionName,
+        CreateCollectionOptions? collectionCreationOptions = null)
+    {
+        if (database == null) throw new ArgumentNullException(nameof(database));
+        if (collectionName == null) throw new ArgumentNullException(nameof(collectionName));
+
+        if (database.CollectionExists(collectionName)) return;
+
+        try
         {
-            var filter = new BsonDocument("name", collectionName);
-            var collectionCursor =
-                database.ListCollections(new ListCollectionsOptions { Filter = filter });
-            return collectionCursor.Any();
+            database.CreateCollection(collectionName, collectionCreationOptions);
         }
-
-        /// <summary>
-        ///     Verifies the collection exists. If it doesn't, create it using the Collection Creation Options provided.
-        /// </summary>
-        /// <param name="database">The database.</param>
-        /// <param name="collectionName">Name of the collection.</param>
-        /// <param name="collectionCreationOptions">The collection creation options.</param>
-        internal static void VerifyCollectionExists(
-            this IMongoDatabase database,
-            string collectionName,
-            CreateCollectionOptions? collectionCreationOptions = null)
+        catch (MongoCommandException e) when (e.ErrorMessage.Contains(
+                                                  "collection already exists",
+                                                  StringComparison.InvariantCultureIgnoreCase))
         {
-            if (database == null) throw new ArgumentNullException(nameof(database));
-            if (collectionName == null) throw new ArgumentNullException(nameof(collectionName));
+            // handled
+        }
+    }
 
-            if (database.CollectionExists(collectionName)) return;
+    internal static void VerifyExpireTTLSetup(
+        this IMongoDatabase database,
+        string collectionName,
+        TimeSpan? expireTtl)
+    {
+        const string ExpireTTLIndexName = "serilog_sink_expired_ttl";
+
+        var logCollection = database.GetCollection<LogEntry>(collectionName);
+
+        if (expireTtl.HasValue)
+        {
+            var indexKeysDefinition =
+                Builders<LogEntry>.IndexKeys.Ascending(s => s.UtcTimeStamp);
+            var indexOptions = new CreateIndexOptions
+                { Name = ExpireTTLIndexName, ExpireAfter = expireTtl };
+            var indexModel = new CreateIndexModel<LogEntry>(indexKeysDefinition, indexOptions);
 
             try
             {
-                database.CreateCollection(collectionName, collectionCreationOptions);
+                logCollection.Indexes.CreateOne(indexModel);
+
+                return;
             }
-            catch (MongoCommandException e) when (e.ErrorMessage.Contains(
-                                                      "collection already exists",
-                                                      StringComparison.InvariantCultureIgnoreCase))
+            catch (MongoCommandException ex) when (ex.ErrorMessage.Contains(
+                                                       "already exists with different options"))
             {
-                // handled
+                // handled -- just drop and recreate
+                logCollection.Indexes.DropOne(ExpireTTLIndexName);
+            }
+
+            try
+            {
+                // delete the index and re-create since it exists with different expiration value
+                logCollection.Indexes.CreateOne(indexModel);
+            }
+            catch (MongoCommandException ex)
+            {
+                SelfLog.WriteLine(
+                    "Failure dropping/creating MongoDB Expire TTL Index: {0}",
+                    ex.ErrorMessage);
             }
         }
-
-        internal static void VerifyExpireTTLSetup(
-            this IMongoDatabase database,
-            string collectionName,
-            TimeSpan? expireTtl)
+        else
         {
-            const string ExpireTTLIndexName = "serilog_sink_expired_ttl";
-
-            var logCollection = database.GetCollection<LogEntry>(collectionName);
-
-            if (expireTtl.HasValue)
+            // make sure the expire TTL index doesn't exist
+            try
             {
-                var indexKeysDefinition =
-                    Builders<LogEntry>.IndexKeys.Ascending(s => s.UtcTimeStamp);
-                var indexOptions = new CreateIndexOptions
-                    { Name = ExpireTTLIndexName, ExpireAfter = expireTtl };
-                var indexModel = new CreateIndexModel<LogEntry>(indexKeysDefinition, indexOptions);
-
-                try
-                {
-                    logCollection.Indexes.CreateOne(indexModel);
-
-                    return;
-                }
-                catch (MongoCommandException ex) when (ex.ErrorMessage.Contains("already exists with different options"))
-                {
-                    // handled -- just drop and recreate
-                    logCollection.Indexes.DropOne(ExpireTTLIndexName);
-                }
-
-                try
-                {
-                    // delete the index and re-create since it exists with different expiration value
-                    logCollection.Indexes.CreateOne(indexModel);
-                }
-                catch (MongoCommandException ex)
-                {
-                    SelfLog.WriteLine(
-                        "Failure dropping/creating MongoDB Expire TTL Index: {0}",
-                        ex.ErrorMessage);
-                }
+                logCollection.Indexes.DropOne(ExpireTTLIndexName);
             }
-            else
+            catch (MongoCommandException)
             {
-                // make sure the expire TTL index doesn't exist
-                try
-                {
-                    logCollection.Indexes.DropOne(ExpireTTLIndexName);
-                }
-                catch (MongoCommandException)
-                {
-                }
             }
         }
     }

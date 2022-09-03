@@ -40,6 +40,10 @@
 		<PackageReference Include="MongoDB.Driver" Version="2.17.1" />
 	</ItemGroup>
 
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
+		<Reference Include="System.Configuration" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<None Include="..\..\README.md" Pack="true" PackagePath="\"/>
 	</ItemGroup>

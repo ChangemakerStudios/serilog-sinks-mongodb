@@ -22,71 +22,71 @@ using MongoDB.Driver;
 using Serilog.Helpers;
 using Serilog.Sinks.PeriodicBatching;
 
-namespace Serilog.Sinks.MongoDB
+namespace Serilog.Sinks.MongoDB;
+
+/// <summary>
+///     Writes log events as documents to a MongoDb database.
+/// </summary>
+public abstract class MongoDBSinkBase : PeriodicBatchingSink
 {
+    private readonly MongoDBSinkConfiguration _configuration;
+
+    private readonly Lazy<IMongoDatabase> _mongoDatabase;
+
     /// <summary>
-    ///     Writes log events as documents to a MongoDb database.
+    ///     Construct a sink posting to a specified database.
     /// </summary>
-    public abstract class MongoDBSinkBase : PeriodicBatchingSink
+    protected MongoDBSinkBase(MongoDBSinkConfiguration configuration)
+        : base(configuration.BatchPostingLimit, configuration.BatchPeriod)
     {
-        private readonly MongoDBSinkConfiguration _configuration;
+        if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
-        private readonly Lazy<IMongoDatabase> _mongoDatabase;
+        this._configuration = configuration;
 
-        /// <summary>
-        ///     Construct a sink posting to a specified database.
-        /// </summary>
-        protected MongoDBSinkBase(MongoDBSinkConfiguration configuration)
-            : base(configuration.BatchPostingLimit, configuration.BatchPeriod)
-        {
-            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+        // validate the settings
+        configuration.Validate();
 
-            this._configuration = configuration;
+        this._mongoDatabase = new Lazy<IMongoDatabase>(
+            () => GetVerifiedMongoDatabaseFromConfiguration(this._configuration),
+            LazyThreadSafetyMode.ExecutionAndPublication);
+    }
 
-            // validate the settings
-            configuration.Validate();
+    protected string CollectionName => this._configuration.CollectionName;
 
-            this._mongoDatabase = new Lazy<IMongoDatabase>(
-                () => GetVerifiedMongoDatabaseFromConfiguration(this._configuration),
-                LazyThreadSafetyMode.ExecutionAndPublication);
-        }
+    protected RollingInterval RollingInterval => this._configuration.RollingInterval;
 
-        protected string CollectionName => _configuration.CollectionName;
+    protected static IMongoDatabase GetVerifiedMongoDatabaseFromConfiguration(
+        MongoDBSinkConfiguration configuration)
+    {
+        var mongoDatabase = configuration.MongoDatabase
+                            ?? new MongoClient(configuration.MongoUrl).GetDatabase(
+                                configuration.MongoUrl!.DatabaseName);
 
-        protected RollingInterval RollingInterval => _configuration.RollingInterval;
-        protected static IMongoDatabase GetVerifiedMongoDatabaseFromConfiguration(
-            MongoDBSinkConfiguration configuration)
-        {
-            var mongoDatabase = configuration.MongoDatabase
-                                ?? new MongoClient(configuration.MongoUrl).GetDatabase(
-                                    configuration.MongoUrl!.DatabaseName);
+        // connection attempt
+        mongoDatabase.VerifyCollectionExists(
+            configuration.CollectionName,
+            configuration.CollectionCreationOptions);
 
-            // connection attempt
-            mongoDatabase.VerifyCollectionExists(
-                configuration.CollectionName,
-                configuration.CollectionCreationOptions);
+        // setup TTL if desired
+        mongoDatabase.VerifyExpireTTLSetup(
+            configuration.CollectionName,
+            configuration.ExpireTTL);
 
-            // setup TTL if desired
-            mongoDatabase.VerifyExpireTTLSetup(
-                configuration.CollectionName,
-                configuration.ExpireTTL);
+        return mongoDatabase;
+    }
 
-            return mongoDatabase;
-        }
+    /// <summary>
+    ///     Gets the log collection.
+    /// </summary>
+    /// <returns></returns>
+    public IMongoCollection<T> GetCollection<T>()
+    {
+        var collectionName = this.RollingInterval.GetCollectionName(this.CollectionName);
+        return this._mongoDatabase.Value.GetCollection<T>(collectionName);
+    }
 
-        /// <summary>
-        ///     Gets the log collection.
-        /// </summary>
-        /// <returns></returns>
-        public IMongoCollection<T> GetCollection<T>()
-        {
-            var collectionName = RollingInterval.GetCollectionName(CollectionName);
-            return this._mongoDatabase.Value.GetCollection<T>(collectionName);
-        }
-
-        protected Task InsertMany<T>(IEnumerable<T> objects)
-        {
-            return Task.WhenAll(this.GetCollection<T>().InsertManyAsync(objects));
-        }
+    protected Task InsertMany<T>(IEnumerable<T> objects)
+    {
+        return Task.WhenAll(this.GetCollection<T>().InsertManyAsync(objects));
     }
 }
