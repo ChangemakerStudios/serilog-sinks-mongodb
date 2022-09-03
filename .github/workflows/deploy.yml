@@ -30,8 +30,8 @@ jobs:
         
     - name: Pack
       run: dotnet pack -c Release -p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersion }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
-        
+# && (github.ref_name == 'master')        
     - name: Publish
-      if: github.event_name != 'pull_request' && (github.ref_name == 'master')
+      if: github.event_name != 'pull_request'
       run: |
         dotnet nuget push **/*.nupkg --source 'https://api.nuget.org/v3/index.json' -k ${{ secrets.NUGETKEY }}
