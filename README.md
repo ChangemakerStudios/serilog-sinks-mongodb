@@ -84,3 +84,7 @@ Keys and values are not case-sensitive. This is an example of configuring the Mo
   }
 }
 ```
+
+## Icon
+
+[MongoDB](https://icons8.com/icon/74402/mongodb) icon by [Icons8](https://icons8.com)
