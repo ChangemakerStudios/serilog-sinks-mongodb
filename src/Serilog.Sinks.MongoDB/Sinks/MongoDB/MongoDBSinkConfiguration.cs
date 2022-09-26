@@ -36,6 +36,8 @@ public class MongoDBSinkConfiguration
 
     public bool Legacy { get; internal set; }
 
+    public InsertManyOptions? InsertManyOptions { get; internal set; }
+
     public RollingInterval RollingInterval { get; private set; } = RollingInterval.Infinite;
 
     public void Validate()
@@ -82,6 +84,19 @@ public class MongoDBSinkConfiguration
     public void SetExpireTTL(TimeSpan? timeToLive)
     {
         this.ExpireTTL = timeToLive;
+    }
+
+    /// <summary>
+    /// Allows configuring "InsertManyOptions" in MongoDb.
+    /// </summary>
+    /// <param name="configureInsertManyOptions"></param>
+    public void ConfigureInsertOptions(Action<InsertManyOptions> configureInsertManyOptions)
+    {
+        if (configureInsertManyOptions == null) throw new ArgumentNullException(nameof(configureInsertManyOptions));
+
+        var options = new InsertManyOptions();
+        configureInsertManyOptions(options);
+        this.InsertManyOptions = options;
     }
 
     /// <summary>
