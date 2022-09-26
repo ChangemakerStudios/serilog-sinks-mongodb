@@ -1,4 +1,4 @@
-# Serilog.Sinks.MongoDB
+# <img src="https://raw.githubusercontent.com/ChangemakerStudios/serilog-sinks-mongodb/dev/assets/mongo-icon.png" width="32" height="32" /> Serilog.Sinks.MongoDB
 
 ![Build status](https://github.com/ChangemakerStudios/serilog-sinks-mongodb/actions/workflows/deploy.yml/badge.svg)
 
@@ -84,3 +84,7 @@ Keys and values are not case-sensitive. This is an example of configuring the Mo
   }
 }
 ```
+
+## Icon
+
+[MongoDB](https://icons8.com/icon/74402/mongodb) icon by [Icons8](https://icons8.com)

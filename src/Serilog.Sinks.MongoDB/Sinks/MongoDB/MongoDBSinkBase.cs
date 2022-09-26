@@ -87,6 +87,9 @@ public abstract class MongoDBSinkBase : PeriodicBatchingSink
 
     protected Task InsertMany<T>(IEnumerable<T> objects)
     {
-        return Task.WhenAll(this.GetCollection<T>().InsertManyAsync(objects));
+        return Task.WhenAll(
+            this.GetCollection<T>().InsertManyAsync(
+                objects,
+                this._configuration.InsertManyOptions));
     }
 }
