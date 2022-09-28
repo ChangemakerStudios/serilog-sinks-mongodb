@@ -16,6 +16,8 @@ using System;
 
 using MongoDB.Driver;
 
+using Serilog.Sinks.PeriodicBatching;
+
 namespace Serilog.Sinks.MongoDB;
 
 public class MongoDBSinkConfiguration
@@ -87,12 +89,13 @@ public class MongoDBSinkConfiguration
     }
 
     /// <summary>
-    /// Allows configuring "InsertManyOptions" in MongoDb.
+    ///     Allows configuring "InsertManyOptions" in MongoDb.
     /// </summary>
     /// <param name="configureInsertManyOptions"></param>
     public void ConfigureInsertOptions(Action<InsertManyOptions> configureInsertManyOptions)
     {
-        if (configureInsertManyOptions == null) throw new ArgumentNullException(nameof(configureInsertManyOptions));
+        if (configureInsertManyOptions == null)
+            throw new ArgumentNullException(nameof(configureInsertManyOptions));
 
         var options = new InsertManyOptions();
         configureInsertManyOptions(options);
@@ -211,4 +214,13 @@ public class MongoDBSinkConfiguration
         this.SetMongoUrl(connectionString);
     }
 #endif
+
+    internal PeriodicBatchingSinkOptions ToPeriodicBatchingSinkOptions()
+    {
+        return new PeriodicBatchingSinkOptions
+        {
+            BatchSizeLimit = this.BatchPostingLimit,
+            Period = this.BatchPeriod
+        };
+    }
 }

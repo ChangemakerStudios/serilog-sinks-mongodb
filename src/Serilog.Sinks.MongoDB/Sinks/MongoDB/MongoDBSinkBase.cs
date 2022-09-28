@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 
 using MongoDB.Driver;
 
+using Serilog.Events;
 using Serilog.Helpers;
 using Serilog.Sinks.PeriodicBatching;
 
@@ -27,7 +28,7 @@ namespace Serilog.Sinks.MongoDB;
 /// <summary>
 ///     Writes log events as documents to a MongoDb database.
 /// </summary>
-public abstract class MongoDBSinkBase : PeriodicBatchingSink
+public abstract class MongoDBSinkBase : IBatchedLogEventSink
 {
     private readonly MongoDBSinkConfiguration _configuration;
 
@@ -37,7 +38,6 @@ public abstract class MongoDBSinkBase : PeriodicBatchingSink
     ///     Construct a sink posting to a specified database.
     /// </summary>
     protected MongoDBSinkBase(MongoDBSinkConfiguration configuration)
-        : base(configuration.BatchPostingLimit, configuration.BatchPeriod)
     {
         if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
@@ -54,6 +54,13 @@ public abstract class MongoDBSinkBase : PeriodicBatchingSink
     protected string CollectionName => this._configuration.CollectionName;
 
     protected RollingInterval RollingInterval => this._configuration.RollingInterval;
+
+    public abstract Task EmitBatchAsync(IEnumerable<LogEvent> batch);
+
+    public virtual Task OnEmptyBatchAsync()
+    {
+        return Task.CompletedTask;
+    }
 
     protected static IMongoDatabase GetVerifiedMongoDatabaseFromConfiguration(
         MongoDBSinkConfiguration configuration)

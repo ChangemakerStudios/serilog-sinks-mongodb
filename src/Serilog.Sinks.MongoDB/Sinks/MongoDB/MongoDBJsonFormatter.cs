@@ -18,14 +18,12 @@ using System.IO;
 
 using MongoDB.Bson;
 
-using Serilog.Formatting.Json;
-
 namespace Serilog.Sinks.MongoDB;
 
 /// <summary>
 ///     JsonFormatter for MongoDB
 /// </summary>
-public class MongoDBJsonFormatter : JsonFormatter
+public class MongoDBJsonFormatter : DefaultJsonFormatter
 {
     private readonly IDictionary<Type, Action<object, TextWriter>> _dateTimeWriters;
 
