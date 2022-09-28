@@ -1,4 +1,4 @@
-# <img src="https://raw.githubusercontent.com/ChangemakerStudios/serilog-sinks-mongodb/dev/assets/mongo-icon.png" width="32" height="32" /> Serilog.Sinks.MongoDB
+# ![mongo icon](https://raw.githubusercontent.com/ChangemakerStudios/serilog-sinks-mongodb/dev/assets/mongo-icon.png) Serilog.Sinks.MongoDB
 
 ![Build status](https://github.com/ChangemakerStudios/serilog-sinks-mongodb/actions/workflows/deploy.yml/badge.svg)
 
