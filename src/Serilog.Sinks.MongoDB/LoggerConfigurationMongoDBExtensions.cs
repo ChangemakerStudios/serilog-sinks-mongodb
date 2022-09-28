@@ -20,6 +20,7 @@ using Serilog.Configuration;
 using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Sinks.MongoDB;
+using Serilog.Sinks.PeriodicBatching;
 
 // ReSharper disable once CheckNamespace
 namespace Serilog;
@@ -72,7 +73,9 @@ public static class LoggerConfigurationMongoDBExtensions
         cfg.Validate();
 
         return loggerConfiguration.Sink(
-            new MongoDBSink(cfg),
+            new PeriodicBatchingSink(
+                new MongoDBSink(cfg),
+                cfg.ToPeriodicBatchingSinkOptions()),
             restrictedToMinimumLevel);
     }
 
@@ -100,7 +103,9 @@ public static class LoggerConfigurationMongoDBExtensions
         cfg.Validate();
 
         return loggerConfiguration.Sink(
-            new MongoDBSink(cfg),
+            new PeriodicBatchingSink(
+                new MongoDBSink(cfg),
+                cfg.ToPeriodicBatchingSinkOptions()),
             restrictedToMinimumLevel);
     }
 
@@ -141,10 +146,12 @@ public static class LoggerConfigurationMongoDBExtensions
 
         return
             loggerConfiguration.Sink(
-                new MongoDBSinkLegacy(
-                    cfg,
-                    formatProvider,
-                    mongoDBJsonFormatter),
+                new PeriodicBatchingSink(
+                    new MongoDBSinkLegacy(
+                        cfg,
+                        formatProvider,
+                        mongoDBJsonFormatter),
+                    cfg.ToPeriodicBatchingSinkOptions()),
                 restrictedToMinimumLevel);
     }
 
@@ -184,10 +191,12 @@ public static class LoggerConfigurationMongoDBExtensions
 
         return
             loggerConfiguration.Sink(
-                new MongoDBSinkLegacy(
-                    cfg,
-                    formatProvider,
-                    mongoDBJsonFormatter),
+                new PeriodicBatchingSink(
+                    new MongoDBSinkLegacy(
+                        cfg,
+                        formatProvider,
+                        mongoDBJsonFormatter),
+                    cfg.ToPeriodicBatchingSinkOptions()),
                 restrictedToMinimumLevel);
     }
 
@@ -236,10 +245,12 @@ public static class LoggerConfigurationMongoDBExtensions
 
         return
             loggerConfiguration.Sink(
-                new MongoDBSinkLegacy(
-                    cfg,
-                    formatProvider,
-                    mongoDBJsonFormatter),
+                new PeriodicBatchingSink(
+                    new MongoDBSinkLegacy(
+                        cfg,
+                        formatProvider,
+                        mongoDBJsonFormatter),
+                    cfg.ToPeriodicBatchingSinkOptions()),
                 restrictedToMinimumLevel);
     }
 
@@ -284,10 +295,12 @@ public static class LoggerConfigurationMongoDBExtensions
 
         return
             loggerConfiguration.Sink(
-                new MongoDBSinkLegacy(
-                    cfg,
-                    formatProvider,
-                    mongoDBJsonFormatter),
+                new PeriodicBatchingSink(
+                    new MongoDBSinkLegacy(
+                        cfg,
+                        formatProvider,
+                        mongoDBJsonFormatter),
+                    cfg.ToPeriodicBatchingSinkOptions()),
                 restrictedToMinimumLevel);
     }
 }

@@ -107,7 +107,7 @@ public class MongoDBSinkLegacy : MongoDBSinkBase
     ///     ,
     ///     not both. Overriding EmitBatch() is preferred.
     /// </remarks>
-    protected override Task EmitBatchAsync(IEnumerable<LogEvent> events)
+    public override Task EmitBatchAsync(IEnumerable<LogEvent> events)
     {
         return this.InsertMany(this.GenerateBsonDocuments(events));
     }
