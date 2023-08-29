@@ -33,6 +33,8 @@ public class LogEntry
 
     public DateTime UtcTimeStamp { get; set; }
 
+    public DateTime TimeStamp { get; set; }
+
     public MessageTemplate? MessageTemplate { get; set; }
 
     public string? RenderedMessage { get; set; }
@@ -51,6 +53,7 @@ public class LogEntry
             RenderedMessage = logEvent.RenderMessage(),
             Level = logEvent.Level,
             UtcTimeStamp = logEvent.Timestamp.ToUniversalTime().UtcDateTime,
+            TimeStamp = logEvent.Timestamp.DateTime,
             Exception = logEvent.Exception?.ToBsonDocument().SanitizeDocumentRecursive(),
             Properties = BsonDocument.Create(
                 logEvent.Properties.ToDictionary(
