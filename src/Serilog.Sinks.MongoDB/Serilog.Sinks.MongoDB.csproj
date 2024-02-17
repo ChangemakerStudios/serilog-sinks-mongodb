@@ -8,7 +8,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<PackageVersion>5.3.0</PackageVersion>
+		<PackageVersion>5.4.0</PackageVersion>
 		<Authors>Kiran Makkapati, Jaben Cargman, Serilog Contributors</Authors>
 		<Copyright>Copyright © Serilog Contributors 2014-2022</Copyright>
 		<Description>The MongoDB sink for Serilog</Description>
@@ -19,6 +19,9 @@
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>serilog, mongodb</PackageTags>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageReleaseNotes>
+			v5.4 - Upgraded to MongoDB.Driver to version 2.19 due to vulnerabilities.
+		</PackageReleaseNotes>
     </PropertyGroup>
 
 	<PropertyGroup>
