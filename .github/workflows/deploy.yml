@@ -27,11 +27,14 @@ jobs:
       uses: gittools/actions/gitversion/execute@v0.9.7
       with:
         useConfigFile: true
+
+    - name: Run Tests
+      run: dotnet test        
         
     - name: Pack
       run: dotnet pack -c Release -p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersion }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
    
     - name: Publish
-      if: github.event_name != 'pull_request' && (github.ref_name == 'master')  
+      if: github.event_name != 'pull_request' && (github.ref_name == 'master')
       run: |
-        dotnet nuget push **/*.nupkg --source 'https://api.nuget.org/v3/index.json' -k ${{ secrets.NUGETKEY }}
+        dotnet nuget push **/*.snupkg --source 'https://api.nuget.org/v3/index.json' -k ${{ secrets.NUGETKEY }} --skip-duplicate
