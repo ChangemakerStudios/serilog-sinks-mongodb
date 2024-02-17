@@ -181,7 +181,7 @@ public abstract class DefaultJsonFormatter : ITextFormatter
             output.Write("\":[");
 
             var fdelim = "";
-            foreach (var format in ptoken)
+            foreach (var format in ptoken.Where(s => s != null))
             {
                 output.Write(fdelim);
                 fdelim = ",";
@@ -189,7 +189,7 @@ public abstract class DefaultJsonFormatter : ITextFormatter
                 output.Write("{");
                 var eldelim = "";
 
-                WriteJsonProperty("Format", format.Format, ref eldelim, output);
+                WriteJsonProperty("Format", format.Format ?? "", ref eldelim, output);
 
                 var sw = new StringWriter();
                 format.Render(properties, sw);

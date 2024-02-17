@@ -6,10 +6,11 @@ using MongoDB.Driver;
 
 using Serilog.Helpers;
 
-using Xunit;
-
 namespace Serilog.Sinks.MongoDB.Tests;
 
+using NUnit.Framework;
+
+[TestFixture]
 public class LoggerConfigurationMongoDbExtensionsTests
 {
     private const string MongoConnectionString = "mongodb://localhost:27017";
@@ -58,25 +59,25 @@ public class LoggerConfigurationMongoDbExtensionsTests
         return (mongoClient, mongoClient.GetDatabase(MongoDatabaseName));
     }
 
-    [Fact]
+    [Test]
     public void Create_Collection_Based_On_Rolling_Interval_Infinite()
     {
         TestCollectionAndDocumentExists(RollingInterval.Infinite);
     }
 
-    [Fact]
+    [Test]
     public void Create_Collection_Based_On_Rolling_Interval_Minute()
     {
         TestCollectionAndDocumentExists(RollingInterval.Minute);
     }
 
-    [Fact]
+    [Test]
     public void Create_Collection_Based_Without_Rolling_Interval()
     {
         TestCollectionAndDocumentExists();
     }
 
-    [Fact]
+    [Test]
     public void Create_Collection_With_Rolling_Interval_From_Configuration()
     {
         var configuration = new ConfigurationBuilder()

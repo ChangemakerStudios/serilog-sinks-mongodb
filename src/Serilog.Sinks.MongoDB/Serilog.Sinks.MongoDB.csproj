@@ -3,12 +3,12 @@
 		<TargetFrameworks>netstandard2.1;netstandard2.0;net472</TargetFrameworks>
 		<ProjectGuid>2605ed8c-c12a-42fb-9825-32ffea7b4301</ProjectGuid>
 		<RootNamespace>Serilog.Sinks.MongoDB</RootNamespace>
-		<LangVersion>latest</LangVersion>
+		<LangVersion>12</LangVersion>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<PackageVersion>5.3.0</PackageVersion>
+		<PackageVersion>5.4.0</PackageVersion>
 		<Authors>Kiran Makkapati, Jaben Cargman, Serilog Contributors</Authors>
 		<Copyright>Copyright © Serilog Contributors 2014-2022</Copyright>
 		<Description>The MongoDB sink for Serilog</Description>
@@ -19,6 +19,9 @@
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>serilog, mongodb</PackageTags>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageReleaseNotes>
+			v5.4 - Upgraded to MongoDB.Driver to version 2.19 due to vulnerabilities.
+		</PackageReleaseNotes>
     </PropertyGroup>
 
 	<PropertyGroup>
@@ -29,15 +32,18 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-		<PackageReference Include="Nullable" Version="1.3.1" PrivateAssets="All" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+		<PackageReference Include="PolySharp" Version="1.14.1">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Serilog" Version="2.12.0" />
 		<PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
 		<PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="3.1.0" />
-		<PackageReference Include="MongoDB.Driver" Version="2.17.1" />
+		<PackageReference Include="MongoDB.Driver" Version="2.19.0" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
