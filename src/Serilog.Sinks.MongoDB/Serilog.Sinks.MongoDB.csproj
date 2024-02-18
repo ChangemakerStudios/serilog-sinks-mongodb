@@ -13,6 +13,7 @@
 		<Authors>Kiran Makkapati, Jaben Cargman, Serilog Contributors</Authors>
 		<Copyright>Copyright © Serilog Contributors 2014-2022</Copyright>
 		<Description>The MongoDB sink for Serilog</Description>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 		<PackageIconUrl>http://serilog.net/images/serilog-sink-nuget.png</PackageIconUrl>
 		<PackageId>Serilog.Sinks.MongoDB</PackageId>
 		<PackageProjectUrl>http://serilog.net</PackageProjectUrl>
