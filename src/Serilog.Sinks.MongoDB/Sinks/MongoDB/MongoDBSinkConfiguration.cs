@@ -38,6 +38,8 @@ public class MongoDBSinkConfiguration
 
     public bool Legacy { get; internal set; }
 
+    public bool ExcludeMessageTemplate { get; internal set; }
+
     public InsertManyOptions? InsertManyOptions { get; internal set; }
 
     public RollingInterval RollingInterval { get; private set; } = RollingInterval.Infinite;
@@ -58,6 +60,11 @@ public class MongoDBSinkConfiguration
             throw new ArgumentNullException(
                 nameof(this.ExpireTTL),
                 "Expiration TTL is only supported on the MongoDBBson Sink");
+
+        if (this.ExcludeMessageTemplate && this.Legacy)
+            throw new ArgumentNullException(
+                nameof(this.ExcludeMessageTemplate),
+                "Exclude Message Template is only supported on the MongoDBBson Sink");
     }
 
     /// <summary>
@@ -86,6 +93,17 @@ public class MongoDBSinkConfiguration
     public void SetExpireTTL(TimeSpan? timeToLive)
     {
         this.ExpireTTL = timeToLive;
+    }
+
+    /// <summary>
+    ///    Sets if the log should include the "MessageTemplate" field,
+    ///    as the RenderedMessage field is already included the "MessageTemplate"
+    ///    may be unnecessary/redundant.
+    /// </summary>
+    /// <param name="excludeMessageTemplate"></param>
+    public void SetExcludeMessageTemplate(bool excludeMessageTemplate)
+    {
+        this.ExcludeMessageTemplate = excludeMessageTemplate;
     }
 
     /// <summary>

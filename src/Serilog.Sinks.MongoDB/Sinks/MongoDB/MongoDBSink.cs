@@ -46,6 +46,6 @@ public class MongoDBSink : MongoDBSinkBase
 
     public override Task EmitBatchAsync(IEnumerable<LogEvent> events)
     {
-        return this.InsertMany(events.Select(LogEntry.MapFrom));
+        return this.InsertMany(events.Select(@event => LogEntry.MapFrom(@event, this.IncludeMessageTemplate)));
     }
 }

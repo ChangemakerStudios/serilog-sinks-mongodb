@@ -39,7 +39,7 @@ public abstract class MongoDBSinkBase : IBatchedLogEventSink
     /// </summary>
     protected MongoDBSinkBase(MongoDBSinkConfiguration configuration)
     {
-        if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+        if (configuration! == null) throw new ArgumentNullException(nameof(configuration));
 
         this._configuration = configuration;
 
@@ -50,6 +50,8 @@ public abstract class MongoDBSinkBase : IBatchedLogEventSink
             () => GetVerifiedMongoDatabaseFromConfiguration(this._configuration),
             LazyThreadSafetyMode.ExecutionAndPublication);
     }
+
+    protected bool IncludeMessageTemplate => !this._configuration.ExcludeMessageTemplate;
 
     protected string CollectionName => this._configuration.CollectionName;
 
