@@ -14,11 +14,9 @@
 		<Copyright>Copyright © Serilog Contributors 2014-2022</Copyright>
 		<Description>The MongoDB sink for Serilog</Description>
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-		<PackageIconUrl>http://serilog.net/images/serilog-sink-nuget.png</PackageIconUrl>
 		<PackageId>Serilog.Sinks.MongoDB</PackageId>
 		<PackageProjectUrl>http://serilog.net</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/ChangemakerStudios/serilog-sinks-mongodb</RepositoryUrl>
-		<RepositoryType>git</RepositoryType>
+		<PackageIcon>serilog-sink-nuget.png</PackageIcon>
 		<PackageTags>serilog, mongodb</PackageTags>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageReleaseNotes>
@@ -27,11 +25,21 @@
     </PropertyGroup>
 
 	<PropertyGroup>
+		<RepositoryUrl>https://github.com/ChangemakerStudios/serilog-sinks-mongodb</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>		
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="serilog-sink-nuget.png" Pack="true" Visible="false" PackagePath="" />
+    </ItemGroup>	
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
