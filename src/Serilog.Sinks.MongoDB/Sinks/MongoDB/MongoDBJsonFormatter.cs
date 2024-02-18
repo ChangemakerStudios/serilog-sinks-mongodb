@@ -84,7 +84,7 @@ public class MongoDBJsonFormatter : DefaultJsonFormatter
         }
         else
         {
-            base.WriteJsonProperty(name, value, ref precedingDelimiter, output);
+            base.WriteJsonProperty(name, value!, ref precedingDelimiter, output);
         }
     }
 
