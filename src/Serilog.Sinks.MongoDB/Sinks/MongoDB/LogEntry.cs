@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 
 using MongoDB.Bson;
@@ -41,6 +42,10 @@ public class LogEntry
     public BsonDocument? Properties { get; set; }
 
     public BsonDocument? Exception { get; set; }
+    [BsonIgnoreIfNull]
+    public string? TraceId { get; set; }
+    [BsonIgnoreIfNull]
+    public string? SpanId { get; set; }
 
     public static LogEntry MapFrom(LogEvent logEvent, bool includeMessageTemplate)
     {
@@ -51,6 +56,8 @@ public class LogEntry
                            RenderedMessage = logEvent.RenderMessage(),
                            Level = logEvent.Level,
                            UtcTimeStamp = logEvent.Timestamp.ToUniversalTime().UtcDateTime,
+                           TraceId = logEvent.TraceId?.ToString(),
+                           SpanId = logEvent.SpanId?.ToString(),
                            Exception = logEvent.Exception?.ToBsonDocument().SanitizeDocumentRecursive(),
                            Properties = BsonDocument.Create(
                                logEvent.Properties.ToDictionary(
