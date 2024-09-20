@@ -1,4 +1,4 @@
-﻿// Copyright 2014-2022 Serilog Contributors
+﻿// Copyright 2014-2024 Serilog Contributors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ public abstract class MongoDBSinkBase : IBatchedLogEventSink
     /// </summary>
     protected MongoDBSinkBase(MongoDBSinkConfiguration configuration)
     {
-        if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+        if (configuration! == null) throw new ArgumentNullException(nameof(configuration));
 
         this._configuration = configuration;
 
@@ -50,6 +50,8 @@ public abstract class MongoDBSinkBase : IBatchedLogEventSink
             () => GetVerifiedMongoDatabaseFromConfiguration(this._configuration),
             LazyThreadSafetyMode.ExecutionAndPublication);
     }
+
+    protected bool IncludeMessageTemplate => !this._configuration.ExcludeMessageTemplate;
 
     protected string CollectionName => this._configuration.CollectionName;
 

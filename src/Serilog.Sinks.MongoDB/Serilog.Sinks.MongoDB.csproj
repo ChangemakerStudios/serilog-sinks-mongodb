@@ -9,28 +9,37 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<PackageVersion>5.4.0</PackageVersion>
+		<PackageVersion>6.0.0</PackageVersion>
 		<Authors>Kiran Makkapati, Jaben Cargman, Serilog Contributors</Authors>
 		<Copyright>Copyright © Serilog Contributors 2014-2022</Copyright>
 		<Description>The MongoDB sink for Serilog</Description>
-		<PackageIconUrl>http://serilog.net/images/serilog-sink-nuget.png</PackageIconUrl>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 		<PackageId>Serilog.Sinks.MongoDB</PackageId>
 		<PackageProjectUrl>http://serilog.net</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/ChangemakerStudios/serilog-sinks-mongodb</RepositoryUrl>
-		<RepositoryType>git</RepositoryType>
+		<PackageIcon>serilog-sink-nuget.png</PackageIcon>
 		<PackageTags>serilog, mongodb</PackageTags>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageReleaseNotes>
-			v5.4 - Upgraded to MongoDB.Driver to version 2.19 due to vulnerabilities.
+			v6.0 - Upgraded to MongoDB.Driver to version 2.28 due to incompatibilities.
 		</PackageReleaseNotes>
     </PropertyGroup>
 
 	<PropertyGroup>
+		<RepositoryUrl>https://github.com/ChangemakerStudios/serilog-sinks-mongodb</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>		
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="serilog-sink-nuget.png" Pack="true" Visible="false" PackagePath="" />
+    </ItemGroup>	
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
@@ -41,10 +50,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Serilog" Version="2.12.0" />
+		<PackageReference Include="Serilog" Version="3.1.1" />
 		<PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
 		<PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="3.1.0" />
-		<PackageReference Include="MongoDB.Driver" Version="2.19.0" />
+		<PackageReference Include="MongoDB.Driver" Version="2.28.0" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
