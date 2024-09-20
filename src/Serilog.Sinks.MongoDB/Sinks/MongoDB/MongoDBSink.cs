@@ -1,4 +1,4 @@
-﻿// Copyright 2014-2022 Serilog Contributors
+﻿// Copyright 2014-2024 Serilog Contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,9 +14,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 
 using Serilog.Events;
@@ -37,6 +39,10 @@ public class MongoDBSink : MongoDBSinkBase
                     cm.MapProperty(s => s.StackTrace);
                     cm.MapProperty(s => s.Data);
                 });
+
+        // fixes https://github.com/serilog/serilog/issues/2101
+        BsonTypeMapper.RegisterCustomTypeMapper(typeof(IntPtr), new CustomIntPtrMapper());
+        BsonTypeMapper.RegisterCustomTypeMapper(typeof(UIntPtr), new CustomIntPtrMapper());
     }
 
     public MongoDBSink(MongoDBSinkConfiguration configuration)
@@ -46,6 +52,26 @@ public class MongoDBSink : MongoDBSinkBase
 
     public override Task EmitBatchAsync(IEnumerable<LogEvent> events)
     {
-        return this.InsertMany(events.Select(@event => LogEntry.MapFrom(@event, this.IncludeMessageTemplate)));
+        return this.InsertMany(
+            events.Select(@event => LogEntry.MapFrom(@event, this.IncludeMessageTemplate)));
+    }
+
+    private class CustomIntPtrMapper : ICustomBsonTypeMapper
+    {
+        public bool TryMapToBsonValue(object value, [UnscopedRef] out BsonValue? bsonValue)
+        {
+            switch (value)
+            {
+                case IntPtr intPtr:
+                    bsonValue = intPtr.ToInt32();
+                    return true;
+                case UIntPtr uIntPtr:
+                    bsonValue = uIntPtr.ToUInt32();
+                    return true;
+                default:
+                    bsonValue = null;
+                    return false;
+            }
+        }
     }
 }
