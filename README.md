@@ -7,27 +7,51 @@
 A Serilog sink that writes events as documents to [MongoDB](http://mongodb.org).
 
 **Package** - [Serilog.Sinks.MongoDB](http://nuget.org/packages/serilog.sinks.mongodb)
-| **Platforms** - .NET 4.7.2, .NET Standard 2.0,, .NET Standard 2.1
+**Platforms** - .NET 4.7.2, .NET Standard 2.0, .NET Standard 2.1
 
-### New in v6.x
+## Whats New
+
+#### New in v6.x
 * Upgrade MongoDB.Driver to v2.28.0 (Thanks to [Memoyu](https://github.com/Memoyu))
 * Add trace context to LogEntry (Thanks to [fernandovmp](https://github.com/fernandovmp))
 
-### New in v5.x
-* Output structured MongoDB Bson logs by switching to the .MongoDBBson() extensions. Existing the .MongoDB() extensions will continue to work converting logs to Json and then to Bson.
+#### New in v5.x
+* Output structured MongoDB Bson logs by switching to `.MongoDBBson()` extensions. Existing `.MongoDB()` extensions will continue to work converting logs to Json and then to Bson.
 * Rolling Log Collection Naming (Thanks to [Revazashvili](https://github.com/Revazashvili) for the PR!). MongoDBBson sink only.
 * Expire TTL support. MongoDBBson sink only.
 
-### Configuration
+## Installation
+Install the sink via NuGet Package Manager Console:
+
+```powershell
+Install-Package Serilog.Sinks.MongoDB
+```
+
+or via the .NET CLI:
+
+```bash
+dotnet add package Serilog.Sinks.MongoDB
+```
+
+## Usage Examples
 In the examples below, the sink is writing to the database `logs` with structured Bson. The default collection name is `log`, but a custom collection can be supplied with the optional `CollectionName` parameter. The database and collection will be created if they do not exist.
 
+### Basic:
 ```csharp
-// use Bson structured logs
+using Serilog;
+
+// use BSON structured logs
 var log = new LoggerConfiguration()
     .WriteTo.MongoDBBson("mongodb://mymongodb/logs")
     .CreateLogger();
 
-// capped collection using Bson structured logs
+log.Information("This is a test log message");
+```
+
+### Capped Collection:
+
+```csharp
+// capped collection using BSON structured logs
 var log = new LoggerConfiguration()
     .WriteTo.MongoDBBson("mongodb://mymongodb/logs", cfg =>
     {
@@ -39,7 +63,10 @@ var log = new LoggerConfiguration()
         cfg.SetCreateCappedCollection(100);
     })
     .CreateLogger();
+```
 
+### Custom Mongodb Settings:
+```csharp
 // create sink instance with custom mongodb settings.
 var log = new LoggerConfiguration()
 	.WriteTo.MongoDBBson(cfg =>
