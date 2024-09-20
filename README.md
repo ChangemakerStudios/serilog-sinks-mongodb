@@ -10,8 +10,8 @@ A Serilog sink that writes events as documents to [MongoDB](http://mongodb.org).
 | **Platforms** - .NET 4.7.2, .NET Standard 2.0,, .NET Standard 2.1
 
 ### New in v6.x
-* Upgrade MongoDB.Driver to v2.28.0 (Thanks to [Memoyu](https://github.com/Memoyu)
-* Add trace context to LogEntry (Thanks to [fernandovmp](https://github.com/fernandovmp)
+* Upgrade MongoDB.Driver to v2.28.0 (Thanks to [Memoyu](https://github.com/Memoyu))
+* Add trace context to LogEntry (Thanks to [fernandovmp](https://github.com/fernandovmp))
 
 ### New in v5.x
 * Output structured MongoDB Bson logs by switching to the .MongoDBBson() extensions. Existing the .MongoDB() extensions will continue to work converting logs to Json and then to Bson.
