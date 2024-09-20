@@ -1,4 +1,4 @@
-﻿// Copyright 2014-2022 Serilog Contributors
+﻿// Copyright 2014-2024 Serilog Contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 
 using MongoDB.Bson;
@@ -33,6 +34,7 @@ public class LogEntry
 
     public DateTime UtcTimeStamp { get; set; }
 
+    [BsonIgnoreIfNull]
     public MessageTemplate? MessageTemplate { get; set; }
 
     public string? RenderedMessage { get; set; }
@@ -40,22 +42,34 @@ public class LogEntry
     public BsonDocument? Properties { get; set; }
 
     public BsonDocument? Exception { get; set; }
+    [BsonIgnoreIfNull]
+    public string? TraceId { get; set; }
+    [BsonIgnoreIfNull]
+    public string? SpanId { get; set; }
 
-    public static LogEntry MapFrom(LogEvent logEvent)
+    public static LogEntry MapFrom(LogEvent logEvent, bool includeMessageTemplate)
     {
         if (logEvent == null) throw new ArgumentNullException(nameof(logEvent));
 
-        return new LogEntry
+        var logEntry = new LogEntry
+                       {
+                           RenderedMessage = logEvent.RenderMessage(),
+                           Level = logEvent.Level,
+                           UtcTimeStamp = logEvent.Timestamp.ToUniversalTime().UtcDateTime,
+                           TraceId = logEvent.TraceId?.ToString(),
+                           SpanId = logEvent.SpanId?.ToString(),
+                           Exception = logEvent.Exception?.ToBsonDocument().SanitizeDocumentRecursive(),
+                           Properties = BsonDocument.Create(
+                               logEvent.Properties.ToDictionary(
+                                   s => s.Key.SanitizedElementName(),
+                                   s => s.Value.ToBsonValue()))
+                       };
+
+        if (includeMessageTemplate)
         {
-            MessageTemplate = logEvent.MessageTemplate,
-            RenderedMessage = logEvent.RenderMessage(),
-            Level = logEvent.Level,
-            UtcTimeStamp = logEvent.Timestamp.ToUniversalTime().UtcDateTime,
-            Exception = logEvent.Exception?.ToBsonDocument().SanitizeDocumentRecursive(),
-            Properties = BsonDocument.Create(
-                logEvent.Properties.ToDictionary(
-                    s => s.Key.SanitizedElementName(),
-                    s => s.Value.ToBsonValue()))
-        };
+            logEntry.MessageTemplate = logEvent.MessageTemplate;
+        }
+
+        return logEntry;
     }
 }

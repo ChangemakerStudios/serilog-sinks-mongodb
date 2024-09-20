@@ -1,11 +1,16 @@
 # ![mongo icon](https://raw.githubusercontent.com/ChangemakerStudios/serilog-sinks-mongodb/dev/assets/mongo-icon.png) Serilog.Sinks.MongoDB
 
-![Build status](https://github.com/ChangemakerStudios/serilog-sinks-mongodb/actions/workflows/deploy.yml/badge.svg)
+[![NuGet version](https://badge.fury.io/nu/Serilog.Sinks.MongoDB.svg)](https://badge.fury.io/nu/Serilog.Sinks.MongoDB)
+[![Downloads](https://img.shields.io/nuget/dt/Serilog.Sinks.MongoDB.svg?logo=nuget&color=purple)](https://www.nuget.org/packages/Serilog.Sinks.MongoDB) 
+[![Build status](https://github.com/ChangemakerStudios/serilog-sinks-mongodb/actions/workflows/deploy.yml/badge.svg)](https://github.com/ChangemakerStudios/serilog-sinks-mongodb/actions) 
 
 A Serilog sink that writes events as documents to [MongoDB](http://mongodb.org).
 
 **Package** - [Serilog.Sinks.MongoDB](http://nuget.org/packages/serilog.sinks.mongodb)
 | **Platforms** - .NET 4.7.2, .NET Standard 2.0,, .NET Standard 2.1
+
+### New in v6.x
+* Upgraded to MongoDb v2.28 -- fixing breaking changes.
 
 ### New in v5.x
 * Output structured MongoDB Bson logs by switching to the .MongoDBBson() extensions. Existing the .MongoDB() extensions will continue to work converting logs to Json and then to Bson.

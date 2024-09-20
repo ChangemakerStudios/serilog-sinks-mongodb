@@ -1,4 +1,4 @@
-﻿// Copyright 2014-2022 Serilog Contributors
+﻿// Copyright 2014-2024 Serilog Contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ public class MongoDBJsonFormatter : DefaultJsonFormatter
         }
         else
         {
-            base.WriteJsonProperty(name, value, ref precedingDelimiter, output);
+            base.WriteJsonProperty(name, value!, ref precedingDelimiter, output);
         }
     }
 
