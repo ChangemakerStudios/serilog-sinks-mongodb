@@ -7,9 +7,12 @@
 A Serilog sink that writes events as documents to [MongoDB](http://mongodb.org).
 
 **Package** - [Serilog.Sinks.MongoDB](http://nuget.org/packages/serilog.sinks.mongodb)
-**Platforms** - .NET 4.7.2, .NET Standard 2.0, .NET Standard 2.1
+**Platforms** - .NET 4.7.2, .NET 6.0, .NET Standard 2.1
 
 ## Whats New
+
+#### New in v7.x
+* Upgrade MongoDB.Driver to v3.0 - .NET Standard 2.0 support has been removed.
 
 #### New in v6.x
 * Upgrade MongoDB.Driver to v2.28.0 (Thanks to [Memoyu](https://github.com/Memoyu))
