@@ -71,14 +71,16 @@ public abstract class MongoDBSinkBase : IBatchedLogEventSink
                             ?? new MongoClient(configuration.MongoUrl).GetDatabase(
                                 configuration.MongoUrl!.DatabaseName);
 
+        var collectionName = configuration.RollingInterval.GetCollectionName(configuration.CollectionName);
+
         // connection attempt
         mongoDatabase.VerifyCollectionExists(
-            configuration.CollectionName,
+            collectionName,
             configuration.CollectionCreationOptions);
 
         // setup TTL if desired
         mongoDatabase.VerifyExpireTTLSetup(
-            configuration.CollectionName,
+            collectionName,
             configuration.ExpireTTL);
 
         return mongoDatabase;
