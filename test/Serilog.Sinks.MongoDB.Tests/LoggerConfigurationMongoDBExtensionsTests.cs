@@ -34,7 +34,7 @@ public class LoggerConfigurationMongoDbExtensionsTests
                        {
                            configuration.SetMongoDatabase(mongoDatabase);
                            if (rollingInterval is not null)
-                               configuration.SetRollingInternal(rollingInterval.Value);
+                               configuration.SetRollingInterval(rollingInterval.Value);
                            configuration.SetCollectionName(MongoCollectionName);
                        }).CreateLogger())
         {

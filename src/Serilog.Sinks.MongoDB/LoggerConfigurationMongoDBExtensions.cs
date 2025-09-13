@@ -68,7 +68,7 @@ public static class LoggerConfigurationMongoDBExtensions
                 cappedMaxSizeMb ?? MongoDBSinkDefaults.CappedCollectionMaxSizeMb,
                 cappedMaxDocuments);
 
-        if (rollingInterval.HasValue) cfg.SetRollingInternal(rollingInterval.Value);
+        if (rollingInterval.HasValue) cfg.SetRollingInterval(rollingInterval.Value);
 
         cfg.Validate();
 
