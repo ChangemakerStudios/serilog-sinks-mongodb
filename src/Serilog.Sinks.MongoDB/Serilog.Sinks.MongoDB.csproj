@@ -9,7 +9,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<PackageVersion>7.0.0</PackageVersion>
+		<PackageVersion>7.1.0</PackageVersion>
 		<Authors>Kiran Makkapati, Jaben Cargman, Serilog Contributors</Authors>
 		<Copyright>Copyright © Serilog Contributors 2014-2022</Copyright>
 		<Description>The MongoDB sink for Serilog</Description>
@@ -20,7 +20,7 @@
 		<PackageTags>serilog, mongodb</PackageTags>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageReleaseNotes>
-			v7.0 - Upgraded to MongoDB.Driver to version 3.0 fixing incompatibilities.
+			v7.1 - Bug fixes: Guid to BsonValue mapping (#91), RollingInterval collection naming (#95), SetRollingInterval method name correction (#97).
 		</PackageReleaseNotes>
     </PropertyGroup>
 

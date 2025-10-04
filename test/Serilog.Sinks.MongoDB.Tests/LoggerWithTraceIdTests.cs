@@ -2,6 +2,9 @@ using FluentAssertions;
 
 using Microsoft.Extensions.Configuration;
 
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 
 using Serilog.Helpers;
@@ -14,6 +17,12 @@ using NUnit.Framework;
 [TestFixture]
 public class LoggerWithTraceIdTests
 {
+    [OneTimeSetUp]
+    public void SetupMongo()
+    {
+        BsonSerializer.TryRegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
+    }
+
     private const string MongoConnectionString = "mongodb://localhost:27017";
 
     private const string MongoDatabaseName = "mongodb-sink";

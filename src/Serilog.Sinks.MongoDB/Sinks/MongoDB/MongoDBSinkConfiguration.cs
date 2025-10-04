@@ -71,7 +71,7 @@ public class MongoDBSinkConfiguration
     ///     Set the RollingInterval. (Default: RollingInterval.Infinite)
     /// </summary>
     /// <param name="rollingInterval"></param>
-    public void SetRollingInternal(RollingInterval rollingInterval)
+    public void SetRollingInterval(RollingInterval rollingInterval)
     {
         this.RollingInterval = rollingInterval;
     }
