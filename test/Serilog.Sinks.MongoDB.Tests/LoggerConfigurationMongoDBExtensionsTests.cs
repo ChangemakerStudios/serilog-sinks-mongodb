@@ -2,17 +2,26 @@
 
 using Microsoft.Extensions.Configuration;
 
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
+
+using NUnit.Framework;
 
 using Serilog.Helpers;
 
 namespace Serilog.Sinks.MongoDB.Tests;
 
-using NUnit.Framework;
-
 [TestFixture]
 public class LoggerConfigurationMongoDbExtensionsTests
 {
+    [OneTimeSetUp]
+    public void SetupMongo()
+    {
+        BsonSerializer.TryRegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
+    }
+
     private const string MongoConnectionString = "mongodb://localhost:27017";
 
     private const string MongoDatabaseName = "mongodb-sink";
@@ -29,14 +38,13 @@ public class LoggerConfigurationMongoDbExtensionsTests
         const string Message = "some message logged into mongodb";
 
         using (var logger = new LoggerConfiguration()
-                   .WriteTo.MongoDBBson(
-                       configuration =>
-                       {
-                           configuration.SetMongoDatabase(mongoDatabase);
-                           if (rollingInterval is not null)
-                               configuration.SetRollingInterval(rollingInterval.Value);
-                           configuration.SetCollectionName(MongoCollectionName);
-                       }).CreateLogger())
+                   .WriteTo.MongoDBBson(configuration =>
+                   {
+                       configuration.SetMongoDatabase(mongoDatabase);
+                       if (rollingInterval is not null)
+                           configuration.SetRollingInterval(rollingInterval.Value);
+                       configuration.SetCollectionName(MongoCollectionName);
+                   }).CreateLogger())
         {
             logger.Information(Message);
         }

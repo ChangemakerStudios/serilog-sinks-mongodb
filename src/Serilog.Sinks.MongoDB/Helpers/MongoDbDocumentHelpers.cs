@@ -56,11 +56,15 @@ internal static class MongoDbDocumentHelpers
 
         if (value is ScalarValue scalar)
         {
+            if (scalar.Value is null) return null;
+
             if (scalar.Value is Uri uri) return BsonValue.Create(uri.ToString());
 
             if (scalar.Value is TimeSpan ts) return BsonValue.Create(ts.ToString());
 
             if (scalar.Value is DateTimeOffset dto) return BsonValue.Create(dto.ToString());
+
+            if (scalar.Value is Guid guid) return BsonValue.Create(guid.ToString());
 
             return BsonValue.Create(scalar.Value);
         }
