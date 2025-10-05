@@ -1,22 +1,38 @@
-using FluentAssertions;
-using MongoDB.Bson;
-using NUnit.Framework;
-using Serilog.Events;
-using Serilog.Helpers;
-using System;
-
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
-
 namespace Serilog.Sinks.MongoDB.Tests;
 
 [TestFixture]
 public class MongoDbDocumentHelpersTests
 {
-    [OneTimeSetUp]
-    public void SetupMongo()
+    [Test]
+    public void ToBsonValue_WithDateTimeOffset_ShouldConvertToStringBsonValue()
     {
-        BsonSerializer.TryRegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
+        // Arrange
+        var dateTimeOffset = DateTimeOffset.Now;
+        var scalarValue = new ScalarValue(dateTimeOffset);
+
+        // Act
+        var result = scalarValue.ToBsonValue();
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType<BsonString>();
+        result.AsString.Should().Be(dateTimeOffset.ToString());
+    }
+
+    [Test]
+    public void ToBsonValue_WithEmptyGuid_ShouldConvertToStringBsonValue()
+    {
+        // Arrange
+        var guid = Guid.Empty;
+        var scalarValue = new ScalarValue(guid);
+
+        // Act
+        var result = scalarValue.ToBsonValue();
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType<BsonString>();
+        result.AsString.Should().Be(guid.ToString());
     }
 
     [Test]
@@ -36,19 +52,19 @@ public class MongoDbDocumentHelpersTests
     }
 
     [Test]
-    public void ToBsonValue_WithEmptyGuid_ShouldConvertToStringBsonValue()
+    public void ToBsonValue_WithInteger_ShouldConvertToInt32BsonValue()
     {
         // Arrange
-        var guid = Guid.Empty;
-        var scalarValue = new ScalarValue(guid);
+        var intValue = 42;
+        var scalarValue = new ScalarValue(intValue);
 
         // Act
         var result = scalarValue.ToBsonValue();
 
         // Assert
         result.Should().NotBeNull();
-        result.Should().BeOfType<BsonString>();
-        result.AsString.Should().Be(guid.ToString());
+        result.Should().BeOfType<BsonInt32>();
+        result.AsInt32.Should().Be(intValue);
     }
 
     [Test]
@@ -82,11 +98,11 @@ public class MongoDbDocumentHelpersTests
     }
 
     [Test]
-    public void ToBsonValue_WithUri_ShouldConvertToStringBsonValue()
+    public void ToBsonValue_WithString_ShouldConvertToStringBsonValue()
     {
         // Arrange
-        var uri = new Uri("https://example.com");
-        var scalarValue = new ScalarValue(uri);
+        var stringValue = "test string";
+        var scalarValue = new ScalarValue(stringValue);
 
         // Act
         var result = scalarValue.ToBsonValue();
@@ -94,7 +110,7 @@ public class MongoDbDocumentHelpersTests
         // Assert
         result.Should().NotBeNull();
         result.Should().BeOfType<BsonString>();
-        result.AsString.Should().Be(uri.ToString());
+        result.AsString.Should().Be(stringValue);
     }
 
     [Test]
@@ -114,11 +130,11 @@ public class MongoDbDocumentHelpersTests
     }
 
     [Test]
-    public void ToBsonValue_WithDateTimeOffset_ShouldConvertToStringBsonValue()
+    public void ToBsonValue_WithUri_ShouldConvertToStringBsonValue()
     {
         // Arrange
-        var dateTimeOffset = DateTimeOffset.Now;
-        var scalarValue = new ScalarValue(dateTimeOffset);
+        var uri = new Uri("https://example.com");
+        var scalarValue = new ScalarValue(uri);
 
         // Act
         var result = scalarValue.ToBsonValue();
@@ -126,38 +142,6 @@ public class MongoDbDocumentHelpersTests
         // Assert
         result.Should().NotBeNull();
         result.Should().BeOfType<BsonString>();
-        result.AsString.Should().Be(dateTimeOffset.ToString());
-    }
-
-    [Test]
-    public void ToBsonValue_WithString_ShouldConvertToStringBsonValue()
-    {
-        // Arrange
-        var stringValue = "test string";
-        var scalarValue = new ScalarValue(stringValue);
-
-        // Act
-        var result = scalarValue.ToBsonValue();
-
-        // Assert
-        result.Should().NotBeNull();
-        result.Should().BeOfType<BsonString>();
-        result.AsString.Should().Be(stringValue);
-    }
-
-    [Test]
-    public void ToBsonValue_WithInteger_ShouldConvertToInt32BsonValue()
-    {
-        // Arrange
-        var intValue = 42;
-        var scalarValue = new ScalarValue(intValue);
-
-        // Act
-        var result = scalarValue.ToBsonValue();
-
-        // Assert
-        result.Should().NotBeNull();
-        result.Should().BeOfType<BsonInt32>();
-        result.AsInt32.Should().Be(intValue);
+        result.AsString.Should().Be(uri.ToString());
     }
 }

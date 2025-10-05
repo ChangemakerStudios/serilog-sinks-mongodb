@@ -1,69 +1,26 @@
-using FluentAssertions;
-
-using Microsoft.Extensions.Configuration;
-
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Driver;
-
-using Serilog.Helpers;
-
 namespace Serilog.Sinks.MongoDB.Tests;
-
-using System.Diagnostics;
-using NUnit.Framework;
 
 [TestFixture]
 public class LoggerWithTraceIdTests
 {
-    [OneTimeSetUp]
-    public void SetupMongo()
-    {
-        BsonSerializer.TryRegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
-    }
-
-    private const string MongoConnectionString = "mongodb://localhost:27017";
+    private static string MongoConnectionString => MongoTestFixture.ConnectionString;
 
     private const string MongoDatabaseName = "mongodb-sink";
+
+    private static IReadOnlyDictionary<string, string?> GetSerilogMongoConfiguration()
+    {
+        var databaseUrl = $"{MongoConnectionString}/{MongoDatabaseName}";
+
+        return new Dictionary<string, string?>
+        {
+            ["Serilog:WriteTo:0:Args:databaseUrl"] = databaseUrl
+        };
+    }
 
     private static (MongoClient, IMongoDatabase) GetDatabase()
     {
         var mongoClient = new MongoClient(MongoConnectionString);
         return (mongoClient, mongoClient.GetDatabase(MongoDatabaseName));
-    }
-
-    [Test]
-    public void Log_Without_Activity_Should_Have_TraceId_And_SpanId_Null()
-    {
-        var configuration = new ConfigurationBuilder()
-            .AddJsonFile("serilog.json")
-            .Build();
-
-        var collectionName = RollingInterval.Month.GetCollectionName("test");
-
-        const string Message = "some message logged into mongodb without activity";
-
-        using (var logger = new LoggerConfiguration()
-                   .ReadFrom.Configuration(configuration)
-                   .CreateLogger())
-        {
-            logger.Information(Message);
-        }
-
-        var (mongoClient, mongoDatabase) = GetDatabase();
-        var collectionExists = mongoDatabase.CollectionExists(collectionName);
-
-        collectionExists.Should().BeTrue();
-
-        var mongoCollection = mongoDatabase.GetCollection<LogEntry>(collectionName);
-        var document = mongoCollection.Find(x => x.RenderedMessage == Message).FirstOrDefault();
-
-        document.Should().NotBeNull();
-        document.TraceId.Should().BeNull();
-        document.SpanId.Should().BeNull();
-
-        mongoClient.DropDatabase(MongoDatabaseName);
     }
 
     [Test]
@@ -74,6 +31,7 @@ public class LoggerWithTraceIdTests
 
         var configuration = new ConfigurationBuilder()
             .AddJsonFile("serilog.json")
+            .AddInMemoryCollection(GetSerilogMongoConfiguration())
             .Build();
 
         var collectionName = RollingInterval.Month.GetCollectionName("test");
@@ -111,6 +69,40 @@ public class LoggerWithTraceIdTests
         document.Should().NotBeNull();
         document.TraceId.Should().Be(traceId.ToString());
         document.SpanId.Should().Be(spanId.ToString());
+
+        mongoClient.DropDatabase(MongoDatabaseName);
+    }
+
+    [Test]
+    public void Log_Without_Activity_Should_Have_TraceId_And_SpanId_Null()
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile("serilog.json")
+            .AddInMemoryCollection(GetSerilogMongoConfiguration())
+            .Build();
+
+        var collectionName = RollingInterval.Month.GetCollectionName("test");
+
+        const string Message = "some message logged into mongodb without activity";
+
+        using (var logger = new LoggerConfiguration()
+                   .ReadFrom.Configuration(configuration)
+                   .CreateLogger())
+        {
+            logger.Information(Message);
+        }
+
+        var (mongoClient, mongoDatabase) = GetDatabase();
+        var collectionExists = mongoDatabase.CollectionExists(collectionName);
+
+        collectionExists.Should().BeTrue();
+
+        var mongoCollection = mongoDatabase.GetCollection<LogEntry>(collectionName);
+        var document = mongoCollection.Find(x => x.RenderedMessage == Message).FirstOrDefault();
+
+        document.Should().NotBeNull();
+        document.TraceId.Should().BeNull();
+        document.SpanId.Should().BeNull();
 
         mongoClient.DropDatabase(MongoDatabaseName);
     }

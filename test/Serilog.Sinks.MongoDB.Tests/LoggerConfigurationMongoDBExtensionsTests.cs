@@ -1,32 +1,23 @@
-﻿using FluentAssertions;
-
-using Microsoft.Extensions.Configuration;
-
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Driver;
-
-using NUnit.Framework;
-
-using Serilog.Helpers;
-
-namespace Serilog.Sinks.MongoDB.Tests;
+﻿namespace Serilog.Sinks.MongoDB.Tests;
 
 [TestFixture]
 public class LoggerConfigurationMongoDbExtensionsTests
 {
-    [OneTimeSetUp]
-    public void SetupMongo()
-    {
-        BsonSerializer.TryRegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
-    }
-
-    private const string MongoConnectionString = "mongodb://localhost:27017";
+    private static string MongoConnectionString => MongoTestFixture.ConnectionString;
 
     private const string MongoDatabaseName = "mongodb-sink";
 
     private const string MongoCollectionName = "test";
+
+    private static IReadOnlyDictionary<string, string?> GetSerilogMongoConfiguration()
+    {
+        var databaseUrl = $"{MongoConnectionString}/{MongoDatabaseName}";
+
+        return new Dictionary<string, string?>
+        {
+            ["Serilog:WriteTo:0:Args:databaseUrl"] = databaseUrl
+        };
+    }
 
     private static void TestCollectionAndDocumentExists(RollingInterval? rollingInterval = null)
     {
@@ -90,6 +81,7 @@ public class LoggerConfigurationMongoDbExtensionsTests
     {
         var configuration = new ConfigurationBuilder()
             .AddJsonFile("serilog.json")
+            .AddInMemoryCollection(GetSerilogMongoConfiguration())
             .Build();
 
         var collectionName = RollingInterval.Month.GetCollectionName("test");
