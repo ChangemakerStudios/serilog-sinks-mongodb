@@ -7,7 +7,7 @@
 A Serilog sink that writes events as documents to [MongoDB](http://mongodb.org).
 
 **Package** - [Serilog.Sinks.MongoDB](http://nuget.org/packages/serilog.sinks.mongodb)
-**Platforms** - .NET 4.7.2, .NET 6.0, .NET Standard 2.1
+**Platforms** - .NET 4.7.2, .NET 6.0+, .NET Standard 2.1
 
 ## Whats New
 
@@ -106,20 +106,155 @@ Keys and values are not case-sensitive. This is an example of configuring the Mo
       }
     },
     "WriteTo": [
-      { 
-      	"Name": "MongoDBBson", 
-        "Args": { 
+      {
+      	"Name": "MongoDBBson",
+        "Args": {
             "databaseUrl": "mongodb://username:password@ip:port/dbName?authSource=admin",
             "collectionName": "logs",
             "cappedMaxSizeMb": "1024",
             "cappedMaxDocuments": "50000",
             "rollingInterval": "Month"
         }
-      } 
+      }
     ]
   }
 }
 ```
+
+## Advanced Configuration
+
+### Authentication & Secure Connections
+
+For password-protected MongoDB instances, Azure Cosmos DB, or SSL/TLS connections:
+
+```csharp
+var log = new LoggerConfiguration()
+    .WriteTo.MongoDBBson(cfg =>
+    {
+        var mongoDbSettings = new MongoClientSettings
+        {
+            UseTls = true,
+            AllowInsecureTls = false, // set true only for dev/testing
+            Credential = MongoCredential.CreateCredential("databaseName", "username", "password"),
+            Server = new MongoServerAddress("your-server.com", 27017)
+        };
+
+        var mongoDbInstance = new MongoClient(mongoDbSettings).GetDatabase("logs");
+        cfg.SetMongoDatabase(mongoDbInstance);
+    })
+    .CreateLogger();
+```
+
+**Azure Cosmos DB** (MongoDB API):
+```csharp
+var connectionString = "mongodb://cosmosdb-account:key@cosmosdb-account.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false";
+var log = new LoggerConfiguration()
+    .WriteTo.MongoDBBson(connectionString)
+    .CreateLogger();
+```
+
+### TTL / Auto-Expiration
+
+Automatically delete old logs using MongoDB's TTL feature:
+
+```csharp
+var log = new LoggerConfiguration()
+    .WriteTo.MongoDBBson(cfg =>
+    {
+        cfg.SetMongoUrl("mongodb://localhost/logs");
+        cfg.SetExpireTTL(TimeSpan.FromDays(30)); // logs expire after 30 days
+    })
+    .CreateLogger();
+```
+
+### Exclude Redundant Fields
+
+Reduce storage costs by excluding the `MessageTemplate` field (the rendered message is still stored):
+
+```csharp
+var log = new LoggerConfiguration()
+    .WriteTo.MongoDBBson(cfg =>
+    {
+        cfg.SetMongoUrl("mongodb://localhost/logs");
+        cfg.SetExcludeMessageTemplate(true); // saves storage space
+    })
+    .CreateLogger();
+```
+
+### Rolling Collections
+
+Create time-based collections (e.g., one per day/month):
+
+```csharp
+var log = new LoggerConfiguration()
+    .WriteTo.MongoDBBson(cfg =>
+    {
+        cfg.SetMongoUrl("mongodb://localhost/logs");
+        cfg.SetCollectionName("log");
+        cfg.SetRollingInterval(RollingInterval.Day); // creates: log-20251004, log-20251005, etc.
+    })
+    .CreateLogger();
+```
+
+**Collection naming patterns:**
+- `RollingInterval.Day` → `log-yyyyMMdd` (e.g., `log-20251004`)
+- `RollingInterval.Month` → `log-yyyyMM` (e.g., `log-202510`)
+- `RollingInterval.Year` → `log-yyyy` (e.g., `log-2025`)
+
+**Querying rolling collections:**
+```csharp
+// Query specific date range - you need to target the correct collection(s)
+var collectionName = $"log-{DateTime.UtcNow:yyyyMMdd}";
+var collection = database.GetCollection<BsonDocument>(collectionName);
+var todayLogs = collection.Find(Builders<BsonDocument>.Filter.Empty).ToList();
+```
+
+## Migration Guide
+
+### From Legacy `.MongoDB()` to `.MongoDBBson()`
+
+The legacy `.MongoDB()` sink converts logs to JSON then to BSON. The newer `.MongoDBBson()` writes structured BSON directly for better performance and features.
+
+**Legacy (still supported):**
+```csharp
+.WriteTo.MongoDB("mongodb://localhost/logs") // converts to JSON first
+```
+
+**New Bson sink (recommended):**
+```csharp
+.WriteTo.MongoDBBson("mongodb://localhost/logs") // native BSON
+```
+
+**MongoDBBson exclusive features:**
+- TTL/Expiration (`SetExpireTTL`)
+- Exclude message template (`SetExcludeMessageTemplate`)
+- Rolling collections (`SetRollingInterval`)
+- Better type mapping and performance
+
+## Troubleshooting
+
+### MongoDB Connection Issues
+**Problem:** Application hangs or fails when MongoDB is unavailable
+**Solution:** Ensure your MongoDB connection string includes appropriate timeouts:
+```csharp
+"mongodb://localhost/logs?connectTimeoutMS=3000&serverSelectionTimeoutMS=3000"
+```
+
+### Type Mapping Errors
+**Problem:** `System.Guid cannot be mapped to BsonValue`
+**Solution:** Ensure you're using the latest version (v7.1+) which includes Guid mapping fixes.
+
+### Capped Collections Not Created
+**Problem:** Capped collection configuration not working
+**Solution:** Ensure the collection doesn't already exist. Drop existing collection first:
+```csharp
+database.DropCollection("logs");
+// Then configure with capped settings
+```
+
+### Rolling Collections Not Named Correctly
+**Problem:** Collection created without time format suffix
+**Solution:** Ensure you're using `MongoDBBson` sink (not legacy `MongoDB`) and v7.1+.
 
 ## Icon
 
