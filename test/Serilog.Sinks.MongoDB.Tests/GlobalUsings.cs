@@ -13,6 +13,8 @@ global using MongoDB.Bson.Serialization;
 global using MongoDB.Bson.Serialization.Serializers;
 global using MongoDB.Driver;
 
+global using NSubstitute;
+
 global using NUnit.Framework;
 
 global using Serilog.Events;

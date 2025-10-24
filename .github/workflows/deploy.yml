@@ -32,7 +32,7 @@ jobs:
         useConfigFile: true
 
     - name: Run Tests
-      run: dotnet test        
+      run: dotnet test -p:GeneratePackageOnBuild=false        
         
     - name: Pack
       run: dotnet build -c Release -p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersion }} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
