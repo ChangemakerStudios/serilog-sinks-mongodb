@@ -6,6 +6,7 @@ namespace Serilog.Sinks.MongoDB.Tests;
 /// instead of string matching, ensuring compatibility across MongoDB versions.
 /// </summary>
 [TestFixture]
+[NonParallelizable]
 public class MongoDbHelperErrorHandlingTests
 {
     private static string MongoConnectionString => MongoTestFixture.ConnectionString;
@@ -24,7 +25,6 @@ public class MongoDbHelperErrorHandlingTests
     public void Cleanup()
     {
         var mongoClient = new MongoClient(MongoConnectionString);
-        mongoClient.DropDatabase(MongoDatabaseName);
     }
 
     #region VerifyCollectionExists Tests
@@ -42,8 +42,6 @@ public class MongoDbHelperErrorHandlingTests
         // Assert
         var collectionExists = mongoDatabase.CollectionExists(collectionName);
         collectionExists.Should().BeTrue("Collection should be created when it doesn't exist");
-
-        mongoClient.DropDatabase(MongoDatabaseName);
     }
 
     [Test]
@@ -59,8 +57,6 @@ public class MongoDbHelperErrorHandlingTests
         // Act & Assert - Should not throw when collection already exists
         var act = () => mongoDatabase.VerifyCollectionExists(collectionName);
         act.Should().NotThrow("VerifyCollectionExists should handle existing collections gracefully");
-
-        mongoClient.DropDatabase(MongoDatabaseName);
     }
 
     [Test]
@@ -70,18 +66,19 @@ public class MongoDbHelperErrorHandlingTests
         var (mongoClient, mongoDatabase) = GetDatabase();
         var collectionName = $"{MongoCollectionName}_race";
 
-        // Pre-create the collection but the method doesn't know about it
-        // This simulates a race condition where CollectionExists returns false
-        // but the collection gets created before CreateCollection is called
-        mongoDatabase.CreateCollection(collectionName);
+        // Act & Assert - Simulate race condition by calling verify concurrently
+        // This forces actual NamespaceExists exceptions when multiple threads
+        // try to create the same collection simultaneously
+        var act = () => Parallel.Invoke(
+            () => mongoDatabase.VerifyCollectionExists(collectionName),
+            () => mongoDatabase.VerifyCollectionExists(collectionName),
+            () => mongoDatabase.VerifyCollectionExists(collectionName)
+        );
 
-        // Act & Assert - Even though it exists, should handle gracefully
-        // The internal check will see it exists and return early,
-        // but if it didn't, the catch block should handle NamespaceExists
-        var act = () => mongoDatabase.VerifyCollectionExists(collectionName);
-        act.Should().NotThrow("Should handle NamespaceExists error code gracefully");
+        act.Should().NotThrow("Should handle NamespaceExists error code gracefully during concurrent creation");
 
-        mongoClient.DropDatabase(MongoDatabaseName);
+        // Verify the collection was created successfully
+        mongoDatabase.CollectionExists(collectionName).Should().BeTrue();
     }
 
     [Test]
@@ -103,8 +100,6 @@ public class MongoDbHelperErrorHandlingTests
         // Assert
         var collectionExists = mongoDatabase.CollectionExists(collectionName);
         collectionExists.Should().BeTrue("Collection should be created with options");
-
-        mongoClient.DropDatabase(MongoDatabaseName);
     }
 
     #endregion
@@ -132,9 +127,10 @@ public class MongoDbHelperErrorHandlingTests
             idx.Contains("name") && idx["name"].AsString == "serilog_sink_expired_ttl");
 
         ttlIndex.Should().NotBeNull("TTL index should be created");
-        ttlIndex!["expireAfterSeconds"].Should().Be((int)expireTtl.TotalSeconds);
+        // Convert to long to handle MongoDB's potential Int64 or Double serialization across versions
+        Convert.ToInt64(ttlIndex!["expireAfterSeconds"].ToDouble())
+            .Should().Be((long)expireTtl.TotalSeconds);
 
-        mongoClient.DropDatabase(MongoDatabaseName);
     }
 
     [Test]
@@ -161,7 +157,6 @@ public class MongoDbHelperErrorHandlingTests
         var act = () => mongoDatabase.VerifyExpireTTLSetup(collectionName, expireTtl);
         act.Should().NotThrow("Should handle existing TTL index with same options");
 
-        mongoClient.DropDatabase(MongoDatabaseName);
     }
 
     [Test]
@@ -195,10 +190,11 @@ public class MongoDbHelperErrorHandlingTests
             idx.Contains("name") && idx["name"].AsString == "serilog_sink_expired_ttl");
 
         ttlIndex.Should().NotBeNull("TTL index should still exist");
-        ttlIndex!["expireAfterSeconds"].Should().Be((int)newExpireTtl.TotalSeconds,
-            "Index should be recreated with new expiration time");
+        // Convert to long to handle MongoDB's potential Int64 or Double serialization across versions
+        Convert.ToInt64(ttlIndex!["expireAfterSeconds"].ToDouble())
+            .Should().Be((long)newExpireTtl.TotalSeconds,
+                "Index should be recreated with new expiration time");
 
-        mongoClient.DropDatabase(MongoDatabaseName);
     }
 
     [Test]
@@ -231,7 +227,6 @@ public class MongoDbHelperErrorHandlingTests
 
         ttlIndex.Should().BeNull("TTL index should be removed when expireTTL is null");
 
-        mongoClient.DropDatabase(MongoDatabaseName);
     }
 
     [Test]
@@ -247,7 +242,6 @@ public class MongoDbHelperErrorHandlingTests
         var act = () => mongoDatabase.VerifyExpireTTLSetup(collectionName, null);
         act.Should().NotThrow("Should handle removal of non-existent index gracefully");
 
-        mongoClient.DropDatabase(MongoDatabaseName);
     }
 
     [Test]
@@ -272,9 +266,10 @@ public class MongoDbHelperErrorHandlingTests
             idx.Contains("name") && idx["name"].AsString == "serilog_sink_expired_ttl").ToList();
 
         ttlIndexes.Should().HaveCount(1, "Should only have one TTL index even after multiple calls");
-        ttlIndexes[0]["expireAfterSeconds"].Should().Be((int)expireTtl.TotalSeconds);
+        // Convert to long to handle MongoDB's potential Int64 or Double serialization across versions
+        Convert.ToInt64(ttlIndexes[0]["expireAfterSeconds"].ToDouble())
+            .Should().Be((long)expireTtl.TotalSeconds);
 
-        mongoClient.DropDatabase(MongoDatabaseName);
     }
 
     #endregion
@@ -323,7 +318,6 @@ public class MongoDbHelperErrorHandlingTests
             "MongoDB should return CodeName 'NamespaceExists' for duplicate collection");
         caughtException.Code.Should().Be(48, "Error code should be 48 for NamespaceExists");
 
-        mongoClient.DropDatabase(MongoDatabaseName);
     }
 
     /// <summary>
@@ -371,7 +365,6 @@ public class MongoDbHelperErrorHandlingTests
             "MongoDB should return CodeName 'IndexOptionsConflict' for index with different options");
         caughtException.Code.Should().Be(85, "Error code should be 85 for IndexOptionsConflict");
 
-        mongoClient.DropDatabase(MongoDatabaseName);
     }
 
     #endregion
