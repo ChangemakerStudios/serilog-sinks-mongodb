@@ -11,17 +11,12 @@ A Serilog sink that writes events as documents to [MongoDB](http://mongodb.org).
 
 ## Whats New
 
-#### New in v7.x
-* Upgrade MongoDB.Driver to v3.0 - .NET Standard 2.0 support has been removed.
+See [CHANGES.md](CHANGES.md) for complete version history.
 
-#### New in v6.x
-* Upgrade MongoDB.Driver to v2.28.0 (Thanks to [Memoyu](https://github.com/Memoyu))
-* Add trace context to LogEntry (Thanks to [fernandovmp](https://github.com/fernandovmp))
-
-#### New in v5.x
-* Output structured MongoDB Bson logs by switching to `.MongoDBBson()` extensions. Existing `.MongoDB()` extensions will continue to work converting logs to Json and then to Bson.
-* Rolling Log Collection Naming (Thanks to [Revazashvili](https://github.com/Revazashvili) for the PR!). MongoDBBson sink only.
-* Expire TTL support. MongoDBBson sink only.
+#### New in v7.2
+* Fixed MongoDB v7.x compatibility - Error handling now uses error codes instead of string matching (#98, #99)
+* Added comprehensive unit tests for MongoDB error handling
+* Improved CI performance
 
 ## Installation
 Install the sink via NuGet Package Manager Console:
