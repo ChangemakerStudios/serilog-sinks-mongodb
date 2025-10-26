@@ -58,9 +58,7 @@ internal static class MongoDbHelper
         {
             database.CreateCollection(collectionName, collectionCreationOptions);
         }
-        catch (MongoCommandException e) when (e.ErrorMessage.Contains(
-                                                  "collection already exists",
-                                                  StringComparison.InvariantCultureIgnoreCase))
+        catch (MongoCommandException e) when (e.CodeName == "NamespaceExists")
         {
             // handled
         }
@@ -89,8 +87,7 @@ internal static class MongoDbHelper
 
                 return;
             }
-            catch (MongoCommandException ex) when (ex.ErrorMessage.Contains(
-                                                       "already exists with different options"))
+            catch (MongoCommandException ex) when (ex.CodeName == "IndexOptionsConflict")
             {
                 // handled -- just drop and recreate
                 logCollection.Indexes.DropOne(ExpireTTLIndexName);
