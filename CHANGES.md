@@ -1,5 +1,9 @@
 # Serilog.Sinks.MongoDB - Change Log
 
+## 7.3.0 (2026-08-14)
+ * Fixed: Rolling interval collection names now use UTC time instead of local time ([#101](https://github.com/ChangemakerStudios/serilog-sinks-mongodb/issues/101), [#102](https://github.com/ChangemakerStudios/serilog-sinks-mongodb/pull/102)) - Thanks to [@ntark](https://github.com/ntark)!
+ * Updated: Raised minimum MongoDB.Driver to 3.9.0 to drop vulnerable SharpCompress transitive dependency ([#105](https://github.com/ChangemakerStudios/serilog-sinks-mongodb/issues/105))
+
 ## 7.2.0 (2025-10-25)
  * Fixed: MongoDB error handling for v7.x compatibility using error codes instead of string matching ([#98](https://github.com/ChangemakerStudios/serilog-sinks-mongodb/issues/98), [#99](https://github.com/ChangemakerStudios/serilog-sinks-mongodb/pull/99)) - Thanks to [@ntark](https://github.com/ntark)!
  * Added: Comprehensive unit tests for MongoDB error handling ([#100](https://github.com/ChangemakerStudios/serilog-sinks-mongodb/pull/100))
