@@ -33,7 +33,7 @@ internal static class RollingIntervalHelper
         if (interval == RollingInterval.Infinite) return collectionName;
 
         return
-            $"{collectionName}_{DateTime.Now.ToString(GetDateTimeFormatForInterval(interval), CultureInfo.InvariantCulture)}";
+            $"{collectionName}_{DateTime.UtcNow.ToString(GetDateTimeFormatForInterval(interval), CultureInfo.InvariantCulture)}";
     }
 
     internal static string GetDateTimeFormatForInterval(this RollingInterval interval)
