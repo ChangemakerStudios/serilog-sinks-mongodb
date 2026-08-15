@@ -13,10 +13,9 @@ A Serilog sink that writes events as documents to [MongoDB](http://mongodb.org).
 
 See [CHANGES.md](CHANGES.md) for complete version history.
 
-#### New in v7.2
-* Fixed MongoDB v7.x compatibility - Error handling now uses error codes instead of string matching (#98, #99)
-* Added comprehensive unit tests for MongoDB error handling
-* Improved CI performance
+#### New in v7.3
+* Fixed rolling interval collection names to use UTC time instead of local time (#101, #102)
+* Raised minimum MongoDB.Driver to 3.9.0 to drop vulnerable SharpCompress transitive dependency (#105)
 
 ## Installation
 Install the sink via NuGet Package Manager Console:
