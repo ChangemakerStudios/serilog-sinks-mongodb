@@ -43,6 +43,8 @@ public static class LoggerConfigurationMongoDBExtensions
     /// <param name="cappedMaxSizeMb"></param>
     /// <param name="cappedMaxDocuments"></param>
     /// <param name="rollingInterval"></param>
+    /// <param name="expireTtl">Allow setting a TTL (Time-To-Live) for log documents in the collection.</param>
+    /// <param name="excludeMessageTemplate">Allow excluding the message template from the log documents.</param>
     /// <returns></returns>
     public static LoggerConfiguration MongoDBBson(
         this LoggerSinkConfiguration loggerConfiguration,
@@ -53,7 +55,9 @@ public static class LoggerConfigurationMongoDBExtensions
         TimeSpan? period = null,
         long? cappedMaxSizeMb = null,
         long? cappedMaxDocuments = null,
-        RollingInterval? rollingInterval = null)
+        RollingInterval? rollingInterval = null,
+        TimeSpan? expireTtl = null,
+        bool excludeMessageTemplate = false)
     {
         var cfg = new MongoDBSinkConfiguration();
 
@@ -69,6 +73,8 @@ public static class LoggerConfigurationMongoDBExtensions
                 cappedMaxDocuments);
 
         if (rollingInterval.HasValue) cfg.SetRollingInterval(rollingInterval.Value);
+        if (expireTtl.HasValue) cfg.SetExpireTTL(expireTtl.Value);
+        if (excludeMessageTemplate) cfg.SetExcludeMessageTemplate(excludeMessageTemplate);
 
         cfg.Validate();
 
