@@ -1,5 +1,10 @@
 # Serilog.Sinks.MongoDB - Change Log
 
+## 8.0.0 (2026-10-23)
+ * **BREAKING**: Upgraded Serilog from 3.1.1 to 4.1.0 and dropped the Serilog.Sinks.PeriodicBatching dependency; the sinks now implement `Serilog.Core.IBatchedLogEventSink` and use Serilog's built-in batching
+ * Added: Failure listener support -- `WriteTo.Fallible(w => w.MongoDBBson(...), listener)` and `WriteTo.FallbackChain(...)` now receive batch failures
+ * Fixed: A failed collection/TTL verification on the first batch (e.g. a server selection timeout) was cached and rethrown for every later batch until restart
+
 ## 7.3.0 (2026-08-14)
  * Fixed: Rolling interval collection names now use UTC time instead of local time ([#101](https://github.com/ChangemakerStudios/serilog-sinks-mongodb/issues/101), [#102](https://github.com/ChangemakerStudios/serilog-sinks-mongodb/pull/102)) - Thanks to [@ntark](https://github.com/ntark)!
  * Updated: Raised minimum MongoDB.Driver to 3.9.0 to drop vulnerable SharpCompress transitive dependency ([#105](https://github.com/ChangemakerStudios/serilog-sinks-mongodb/issues/105))
