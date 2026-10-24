@@ -16,7 +16,7 @@ using System;
 
 using MongoDB.Driver;
 
-using Serilog.Sinks.PeriodicBatching;
+using Serilog.Configuration;
 
 namespace Serilog.Sinks.MongoDB;
 
@@ -233,12 +233,12 @@ public class MongoDBSinkConfiguration
     }
 #endif
 
-    internal PeriodicBatchingSinkOptions ToPeriodicBatchingSinkOptions()
+    internal BatchingOptions ToBatchingOptions()
     {
-        return new PeriodicBatchingSinkOptions
+        return new BatchingOptions
         {
             BatchSizeLimit = this.BatchPostingLimit,
-            Period = this.BatchPeriod
+            BufferingTimeLimit = this.BatchPeriod
         };
     }
 }
