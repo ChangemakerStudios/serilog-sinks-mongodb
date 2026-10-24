@@ -9,9 +9,9 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<PackageVersion>7.3.0</PackageVersion>
+		<PackageVersion>8.0.0</PackageVersion>
 		<Authors>Kiran Makkapati, Jaben Cargman, Serilog Contributors</Authors>
-		<Copyright>Copyright © Serilog Contributors 2014-2025</Copyright>
+		<Copyright>Copyright © Serilog Contributors 2014-2026</Copyright>
 		<Description>The MongoDB sink for Serilog</Description>
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 		<PackageId>Serilog.Sinks.MongoDB</PackageId>
@@ -20,7 +20,7 @@
 		<PackageTags>serilog, mongodb</PackageTags>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageReleaseNotes>
-			v7.3 - Rolling interval collection names now use UTC time (#101, #102). Raised minimum MongoDB.Driver to 3.9.0 to drop vulnerable SharpCompress transitive dependency (#105).
+			v8.0 - BREAKING: Requires Serilog 4.1+; uses Serilog's built-in batching and drops the Serilog.Sinks.PeriodicBatching dependency. Failure listeners (WriteTo.Fallible / FallbackChain) now receive batch failures. A failed collection/TTL verification is retried instead of cached until restart.
 		</PackageReleaseNotes>
     </PropertyGroup>
 
@@ -50,9 +50,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Serilog" Version="3.1.1" />
+		<PackageReference Include="Serilog" Version="4.1.0" />
 		<PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
-		<PackageReference Include="Serilog.Sinks.PeriodicBatching" Version="3.1.0" />
 		<PackageReference Include="MongoDB.Driver" Version="3.9.0" />
 	</ItemGroup>
 

@@ -19,9 +19,9 @@ using System.Threading.Tasks;
 
 using MongoDB.Driver;
 
+using Serilog.Core;
 using Serilog.Events;
 using Serilog.Helpers;
-using Serilog.Sinks.PeriodicBatching;
 
 namespace Serilog.Sinks.MongoDB;
 
@@ -46,9 +46,11 @@ public abstract class MongoDBSinkBase : IBatchedLogEventSink
         // validate the settings
         configuration.Validate();
 
+        // PublicationOnly: ExecutionAndPublication caches a failed verification (e.g. a server selection
+        // timeout during a replica set election) and rethrows it for every batch until the process restarts.
         this._mongoDatabase = new Lazy<IMongoDatabase>(
             () => GetVerifiedMongoDatabaseFromConfiguration(this._configuration),
-            LazyThreadSafetyMode.ExecutionAndPublication);
+            LazyThreadSafetyMode.PublicationOnly);
     }
 
     protected bool IncludeMessageTemplate => !this._configuration.ExcludeMessageTemplate;
@@ -58,6 +60,11 @@ public abstract class MongoDBSinkBase : IBatchedLogEventSink
     protected RollingInterval RollingInterval => this._configuration.RollingInterval;
 
     public abstract Task EmitBatchAsync(IEnumerable<LogEvent> batch);
+
+    Task IBatchedLogEventSink.EmitBatchAsync(IReadOnlyCollection<LogEvent> batch)
+    {
+        return this.EmitBatchAsync(batch);
+    }
 
     public virtual Task OnEmptyBatchAsync()
     {

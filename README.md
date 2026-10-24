@@ -13,10 +13,10 @@ A Serilog sink that writes events as documents to [MongoDB](http://mongodb.org).
 
 See [CHANGES.md](CHANGES.md) for complete version history.
 
-#### New in v7.2
-* Fixed MongoDB v7.x compatibility - Error handling now uses error codes instead of string matching (#98, #99)
-* Added comprehensive unit tests for MongoDB error handling
-* Improved CI performance
+#### New in v8.0
+* **BREAKING**: Requires Serilog 4.1+ -- the sink now uses Serilog's built-in batching and no longer depends on Serilog.Sinks.PeriodicBatching
+* Failure listeners now work: `WriteTo.Fallible(w => w.MongoDBBson(...), listener)` and `WriteTo.FallbackChain(...)` receive batch failures
+* Fixed a failed collection/TTL verification on the first batch being cached and rethrown for every batch until restart
 
 ## Installation
 Install the sink via NuGet Package Manager Console:

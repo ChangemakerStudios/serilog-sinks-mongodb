@@ -97,16 +97,6 @@ public class MongoDBSinkLegacy : MongoDBSinkBase
     /// </summary>
     /// <param name="events">The events to emit.</param>
     /// <returns></returns>
-    /// <remarks>
-    ///     Override either
-    ///     <see
-    ///         cref="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.EmitBatch(System.Collections.Generic.IEnumerable{Serilog.Events.LogEvent})" />
-    ///     or
-    ///     <see
-    ///         cref="M:Serilog.Sinks.PeriodicBatching.PeriodicBatchingSink.EmitBatchAsync(System.Collections.Generic.IEnumerable{Serilog.Events.LogEvent})" />
-    ///     ,
-    ///     not both. Overriding EmitBatch() is preferred.
-    /// </remarks>
     public override Task EmitBatchAsync(IEnumerable<LogEvent> events)
     {
         return this.InsertMany(this.GenerateBsonDocuments(events));
